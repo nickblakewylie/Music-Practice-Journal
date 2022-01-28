@@ -7,6 +7,7 @@ import {PracticeSessions} from './PracticeSessions';
 import AddPractice from './screens/AddPractice';
 import Home from './screens/Home';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Header from './components/Header';
 // function HomeScreen() {
 //   return (
 //     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -68,11 +69,12 @@ export default function App() {
           tabBarBackground: () => (
             <View style={styles.absoluteFill} />
           ),
+          headerStyle:{backgroundColor: "#E8DCB8"}
         })}
       >
-        <Tab.Screen name="Add Practice" component={AddPractice} />
-        <Tab.Screen name="Home" component={Home}  />
-        <Tab.Screen name="Search" component={Search} />
+        <Tab.Screen name="Add Practice" options={{headerTitle: () => <Header name="Music Tracker" />}}  component={AddPractice} />
+        <Tab.Screen name="Home" component={Home} options={{headerShown: false}} />
+        <Tab.Screen name="Search" options={{headerTitle: () => <Header name="Search" />}}  component={Search} />
       </Tab.Navigator>
       </PracticeSessions.Provider>
     </NavigationContainer>

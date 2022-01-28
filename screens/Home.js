@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useContext} from 'react'
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Dimensions} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Dimensions, Button} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Video } from 'expo-av';
 import {PracticeSessions} from '../PracticeSessions'
@@ -8,24 +8,39 @@ import { Ionicons } from '@expo/vector-icons';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import PracticeSession from '../components/PracticeSession';
-import { VictoryLine, VictoryChart, VictoryTheme, VictoryLabel } from 'victory-native';
+import { VictoryLine, VictoryChart, VictoryTheme, VictoryLabel, VictoryBar, VictoryAxis, VictoryGroup, VictoryArea, VictoryScatter } from 'victory-native';
+import Header from '../components/Header';
 
 const Stack = createNativeStackNavigator();
 const Home = () => {
     return (
         <Stack.Navigator
             screenOptions={{
-                headerShown: false
+                headerBackVisible: false,
+                headerStyle:{backgroundColor: "#E8DCB8"},
             }}
             >
             <Stack.Screen
             name="Main"
             component={MainPage}
+            options={{headerTitle: () => <Header name="Practice Sessions"/> }}
+            
             >
             </Stack.Screen>
             <Stack.Screen
                 name="EditPracticePage"
                 component={PracticeSession}
+                options={({navigation}) => ({
+                    headerTitle: () => <Header name="Edit Practice Session"/> ,
+                    headerLeft : () => (
+                        <TouchableOpacity
+                            onPress={() => navigation.navigate('Main')}
+                            style={{position: "absolute", left: 0}}
+                        >
+                            <Ionicons name="arrow-back" size={24} color="black" />
+                        </TouchableOpacity>
+                    )
+                })}
             >
             </Stack.Screen>
         </Stack.Navigator>
@@ -250,7 +265,40 @@ const MainPage = ({navigation})  => {
         }
         setChartData(tempData)
     }
-
+    const chartTheme = {
+        // axis: {
+        //     style: {
+        //       tickLabels: {
+        //         // this changed the color of my numbers to white
+        //         fill: 'white',
+        //       },
+        //       grid : {
+        //           stroke : "transparent"
+        //       },
+        //       dependentAxis: {
+        //           fill: "purple"
+        //       },
+              
+        //     },
+        //   },
+        axis: {
+            style: {
+                tickLabels: {
+                    fill: "white",
+                    padding: 5,
+                },
+                axisLabel: {
+                    fill: "white",
+                    padding: 30
+                },
+                grid: {
+                    stroke: "transparent",
+                    fill:"white"
+                }
+            }
+        }
+        
+    }
     if(practiceSessions != null){
         return(
             <ScrollView style={{backgroundColor: "#1F3659"}}>
@@ -260,7 +308,7 @@ const MainPage = ({navigation})  => {
                                 onPress={() => {setWeekMonthYear(0)}}
                             >
                                 <View style={styles.statBubbleTop}>
-                                    <Text>Last Week</Text>
+                                    <Text style={[styles.statTextColor]}>Last Week</Text>
                                 </View>
                             </TouchableOpacity>
                         </View>
@@ -268,143 +316,69 @@ const MainPage = ({navigation})  => {
                             <TouchableOpacity
                                 onPress={() => {setWeekMonthYear(1)}}
                             >
-                                <Text>This Month</Text>
+                                <Text style={styles.statTextColor}>This Month</Text>
                             </TouchableOpacity>
                         </View>
                         <View style={styles.statBubble}>
                             <TouchableOpacity
                             onPress={() => {setWeekMonthYear(2)}}
                             >
-                                <Text>This Year</Text>
+                                <Text style={styles.statTextColor}>This Year</Text>
                             </TouchableOpacity>
                         </View>
                 </View>
                 <View style={{flex: 1, flexDirection: "row", margin: 5}}>
                     <View style={styles.statBubble}>
                             <View style={styles.statBubbleTop}>
-                                <Ionicons name="time" size={40} color="black"  /><Text style={styles.statBubbleHeader}>Time Practiced</Text>
+                                <Ionicons name="time" size={40} color="black"  /><Text style={[styles.statBubbleHeader, styles.statTextColor]}>Time Practiced</Text>
                             </View>
                             <View>
-                                <Text style={{fontSize: 20, marginLeft:5}}>{Math.round((timePracticed + Number.EPSILON) * 100) / 100} hrs</Text>
+                                <Text style={[{fontSize: 20, marginLeft:5}, styles.statTextColor]}>{Math.round((timePracticed + Number.EPSILON) * 100) / 100} hrs</Text>
                             </View>
                     </View>
                     <View style={styles.statBubble}>
                         <View style={styles.statBubbleTop}>
-                            <Ionicons name="checkmark" size={40} color="green" /><Text style={styles.statBubbleHeader}>Average Quality</Text>
+                            <Ionicons name="checkmark" size={40} color="green" /><Text style={[styles.statBubbleHeader, styles.statTextColor]}>Average Quality</Text>
                         </View>
                         <View>
-                            <Text style={{fontSize: 20, marginLeft: 5}} >{Math.round((averageQuality + Number.EPSILON) * 100) / 100}</Text>
+                            <Text style={[{fontSize: 20, marginLeft: 5}, styles.statTextColor]} >{Math.round((averageQuality + Number.EPSILON) * 100) / 100}</Text>
                         </View>
                     </View>
                 </View>
                 <View style={styles.myChart}>
                     {
                         chartData !=null && chartData.length > 0  && thisMonthsSessions != null? 
-                    <VictoryChart
-                    width={400}
-                    height={275}
-                    theme={VictoryTheme.grayscale}
-                    data={chartData}
-                    >
-                    <VictoryLabel 
-                        x={25}
-                        y={25}
-                        text="Practice Time this Month"
-                    />
-                    <VictoryLine
+                    
+                    <View>
+                        <Text style={[styles.chartTitle,styles.statTextColor]} >My Practice Sessions</Text>
+                        <VictoryChart
+                        width={400}
+                        height={230}
                         data={chartData}
-                        x="x"
-                        y="y"
-                    />
-                    </VictoryChart>: 
+                        theme={chartTheme}
+                        >
+                        <VictoryAxis dependentAxis label="Time (mins)"/>
+                        <VictoryAxis label="Date" />
+                        {/* <VictoryLabel
+                            x={25}
+                            y={25}
+                            text="Practice Time this Month"
+                            style={{color: "white"}}
+                        /> */}
+                        <VictoryBar
+                            data={chartData}
+                            // x="x"
+                            // y="y"
+                            style={{data: {stroke: "gray",fill: "#5F7CA6", width: 8}}}
+                        />
+                        </VictoryChart>
+                    </View>: 
                     <View>
 
                     </View>
 
                     }
                 </View>
-                {/* <Calendar
-                style={{
-                    borderWidth: 1,
-                    borderColor: 'gray',
-                    height: 350
-                }}
-                theme={{
-                    backgroundColor: '#ffffff',
-                    calendarBackground: '#ffffff',
-                    textSectionTitleColor: '#b6c1cd',
-                    textSectionTitleDisabledColor: '#d9e1e8',
-                    selectedDayBackgroundColor: '#00adf5',
-                    selectedDayTextColor: '#ffffff',
-                    todayTextColor: '#00adf5',
-                    dayTextColor: '#2d4150',
-                    textDisabledColor: '#d9e1e8',
-                    dotColor: '#00adf5',
-                    selectedDotColor: '#ffffff',
-                    arrowColor: 'orange',
-                    disabledArrowColor: '#d9e1e8',
-                    monthTextColor: 'blue',
-                    indicatorColor: 'blue',
-                    textDayFontWeight: '300',
-                    textMonthFontWeight: 'bold',
-                    textDayHeaderFontWeight: '300',
-                    textDayFontSize: 16,
-                    textMonthFontSize: 16,
-                    textDayHeaderFontSize: 16
-                  }}
-                    // Initially visible month. Default = now
-                    // Minimum date that can be selected, dates before minDate will be grayed out. Default = undefined
-                    minDate={'2012-05-10'}
-                    // Maximum date that can be selected, dates after maxDate will be grayed out. Default = undefined
-                    maxDate={getYYYYMMDDdate()}
-                    // Handler which gets executed on day press. Default = undefined
-                    onDayPress={day => {
-                        console.log('selected day', day);
-                    }}
-                    // Handler which gets executed on day long press. Default = undefined
-                    onDayLongPress={day => {
-                        console.log('selected day', day);
-                    }}
-                    // Month format in calendar title. Formatting values: http://arshaw.com/xdate/#Formatting
-                    monthFormat={'yyyy MM'}
-                    // Handler which gets executed when visible month changes in calendar. Default = undefined
-                    onMonthChange={month => {
-                        setCurrentMonth(months[month.month - 1])
-                        console.log('month changed', month);
-                    }}
-                    // Hide month navigation arrows. Default = false
-                    hideArrows={true}
-                    // Replace default arrows with custom ones (direction can be 'left' or 'right')
-                    renderArrow={direction => <Arrow />}
-                    // Do not show days of other months in month page. Default = false
-                    hideExtraDays={true}
-                    // If hideArrows = false and hideExtraDays = false do not switch month when tapping on greyed out
-                    // day from another month that is visible in calendar page. Default = false
-                    disableMonthChange={true}
-                    // If firstDay=1 week starts from Monday. Note that dayNames and dayNamesShort should still start from Sunday
-                    firstDay={0}
-                    // Hide day names. Default = false
-                    hideDayNames={false}
-                    // Show week numbers to the left. Default = false
-                    showWeekNumbers={false}
-                    // Handler which gets executed when press arrow icon left. It receive a callback can go back month
-                    onPressArrowLeft={subtractMonth => subtractMonth()}
-                    // Handler which gets executed when press arrow icon right. It receive a callback can go next month
-                    onPressArrowRight={addMonth => addMonth()}
-                    // Disable left arrow. Default = false
-                    disableArrowLeft={false}
-                    // Disable right arrow. Default = false
-                    disableArrowRight={false}
-                    // Disable all touch events for disabled days. can be override with disableTouchEvent in markedDates
-                    disableAllTouchEventsForDisabledDays={true}
-                    // Replace default month and year title with custom one. the function receive a date as parameter
-                    renderHeader={date => {
-                    return <Text style={styles.dateHeader}>{months[date.getMonth()]} {date.getFullYear()}</Text>
-                    }}
-                    // Enable the option to swipe between months. Default = false
-                    enableSwipeMonths={true}
-                    /> */}
-
                 {
                     thisMonthsSessions?
                     thisMonthsSessions.map((data, index) => 
@@ -413,25 +387,11 @@ const MainPage = ({navigation})  => {
                                     onPress={() => {navigation.navigate(('EditPracticePage'), {data : data})}}
                             >                  
                             <View style={styles.sessions}>
-                                    <Text style={{fontSize: 25, color: 'white'}}>Practice Session {makeDateLookNice(data.date)} <TouchableOpacity onPress={() => {deleteFromArray(data.date)}} ><Ionicons name="trash-sharp" size={24} color="#1F3659" /></TouchableOpacity></Text>
-                                    <Text style={{color: "#1F3659"}}>{data.practiceTime} mins</Text>
+                                    <Text style={{fontSize: 25, color: 'white'}}>Practice Session {makeDateLookNice(data.date)} <TouchableOpacity onPress={() => {deleteFromArray(data.date)}} ><Ionicons name="trash-sharp" size={24} color="white" /></TouchableOpacity></Text>
+                                    <Text style={{color: "white"}}>{data.practiceTime} mins</Text>
                                
                             </View>
                             </TouchableOpacity>
-                            {/* <View style={styles.pSessionContainer}>
-                            <Video
-                                ref={video}
-                                style={styles.video}
-                                source={{uri: data.videoUri}}
-                                useNativeControls
-                                resizeMode="cover"
-                                isLooping
-                                onPlaybackStatusUpdate={status => setStatus(() => status)}
-                                />
-                            <Text>Notes : {data.notes}</Text>
-                            <Text>quality {data.quality}</Text>
-                            <Text>practice time : {data.practiceTime} minutes</Text>
-                        </View> */}
                     </View>
                     ): <View></View>
                 }
@@ -460,7 +420,8 @@ const styles = StyleSheet.create({
         borderWidth: 2,
     },
     sessions : {
-        backgroundColor: "#5F7CA6",
+        backgroundColor: "#15243b",
+        // backgroundColor: "#5F7CA6",
         borderWidth: 1,
         margin: 10,
         padding: 5,
@@ -476,16 +437,17 @@ const styles = StyleSheet.create({
     },
     myChart: {
         padding: 5,
-        borderWidth: 2,
-        backgroundColor: "#768ca3",
-        margin: 10,
+        // borderWidth: 2,
+        // margin: 10,
         borderRadius: 15,
         width: 400,
         height: 280,
-        justifyContent: "center"
+        justifyContent: "center",
+        backgroundColor: "#15243b",
+        alignSelf:"center"
     },
     statBubble: {
-        backgroundColor: "white",
+        backgroundColor: "#15243b",
         flex: 0.5,
         margin: 10,
         padding: 5,
@@ -493,9 +455,18 @@ const styles = StyleSheet.create({
     },
     statBubbleTop: {
         flexDirection: "row",
-        alignItems :"center"
+        alignItems :"center",
     },
     statBubbleHeader: {
         fontSize: 21,
+    },
+    statTextColor: {
+        color: "white"
+    },
+    chartTitle: {
+        fontSize: 20,
+        marginTop: 5,
+        marginBottom: 0,
+        marginLeft: 20
     }
 });

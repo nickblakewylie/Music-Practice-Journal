@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect, useContext } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, Animated, Modal, Alert, Pressable, TextInput, Button, Dimensions, Keyboard, TouchableWithoutFeedback} from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Animated, Modal, Alert, Pressable, TextInput, Button, Dimensions, Keyboard, TouchableWithoutFeedback, Easing} from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
 import { Camera } from 'expo-camera';
 import { Video, AVPlaybackStatus } from 'expo-av';
@@ -15,9 +15,11 @@ function AddPractice() {
     const wavesAnim = useRef(new Animated.Value(0)).current
     const createWaves = () => {
         Animated.timing(wavesAnim, {
-            toValue: 1000,
+            toValue: 500,
+            easing: Easing.back(),
             duration: 5000
         }).start()
+        
     }
     const [modalVisible, setModalVisible] = useState(false);
     const [cameraVisible, setCameraVisible] = useState(false);
@@ -85,8 +87,6 @@ function AddPractice() {
             quality: quality,
             videoUri : newFileName
         }
-        // console.log("here is the session info")
-        // console.log(sessionInfo)
         if(getPracticeSession == null){
             getPracticeSession = [sessionInfo]
             await AsyncStorage.setItem('practiceSessions', JSON.stringify(getPracticeSession));
@@ -119,9 +119,9 @@ function AddPractice() {
     }
     return (
         <View style={styles.container}>
-            <Animated.View 
+            {/* <Animated.View 
             style={{width: wavesAnim, borderRadius:10000,height: wavesAnim, backgroundColor: "white", opacity:1, position: "absolute", zIndex: 0}} >
-            </Animated.View>
+            </Animated.View> */}
             <Modal
             animationType="slide"
             transparent="true"
@@ -231,7 +231,7 @@ function AddPractice() {
                             </View>
                         </View>
                         <Modal 
-                        animationType="slide"
+                        animationType="fade"
                         transparent="true"
                         visible={cameraVisible}
                         onRequestClose={() => {
@@ -313,9 +313,6 @@ const styles = StyleSheet.create({
         backgroundColor: 'transparent',
         flexDirection: 'row',
         margin: 50,
-        // alignSelf:"baseline",
-        // alignItems: "center",
-        // justifyContent: "center",
       },
       button: {
         zIndex: 1000,
@@ -418,7 +415,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#1F3659",
         alignItems: 'center',
         color: "#CF5C36",
-        paddingTop: 100
+        paddingTop: 60
     },
     absoluteFill : {
       backgroundColor: "#E8DCB8",
