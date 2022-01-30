@@ -257,7 +257,7 @@ const MainPage = ({navigation})  => {
                     if( tempMonth < 10){
                         tempMonth = "0" + tempMonth
                     }
-                    const dateS = new Date(year.toString() + "-" + tempMonth + "-17")
+                    const dateS = new Date(year.toString() + "-" + tempMonth + "-01")
                     console.log(dateS)
                     tempData.push({x : dateS, y: findPracticeTimeForMonth(monthCount, year)})
                 }
@@ -285,15 +285,18 @@ const MainPage = ({navigation})  => {
             style: {
                 tickLabels: {
                     fill: "white",
-                    padding: 5,
+                    padding: 10,
                 },
                 axisLabel: {
                     fill: "white",
-                    padding: 30
+                    padding: 32
                 },
                 grid: {
                     stroke: "transparent",
                     fill:"white"
+                },
+                axis : {
+                    stroke: "transparent"
                 }
             }
         }
@@ -301,44 +304,44 @@ const MainPage = ({navigation})  => {
     }
     if(practiceSessions != null){
         return(
-            <ScrollView style={{backgroundColor: "#1F3659"}}>
-                <View style={{flex: 1, flexDirection: "row", margin: 5}}>
-                        <View style={styles.statBubble}>
+            <ScrollView style={{backgroundColor: "#1F3659"}}  contentInset={{bottom:50}} >
+                <View style={{flex: 1, flexDirection: "row", margin: 5, marginBottom: 0}}>
+                        <View style={[styles.statBubble, weekMonthYear == 0? styles.acticeColor : ""]}>
                             <TouchableOpacity 
                                 onPress={() => {setWeekMonthYear(0)}}
                             >
-                                <View style={styles.statBubbleTop}>
-                                    <Text style={[styles.statTextColor]}>Last Week</Text>
+                                <View style={[styles.statBubbleTop]}>
+                                    <Text style={[weekMonthYear == 0 ? {color: "black"} : styles.statTextColor,  styles.statFont]}>Last Week</Text>
                                 </View>
                             </TouchableOpacity>
                         </View>
-                        <View style={styles.statBubble}>
+                        <View style={[styles.statBubble, weekMonthYear == 1? styles.acticeColor : ""]}>
                             <TouchableOpacity
                                 onPress={() => {setWeekMonthYear(1)}}
                             >
-                                <Text style={styles.statTextColor}>This Month</Text>
+                                <Text style={[weekMonthYear == 1? {color: "black"} : styles.statTextColor, styles.statFont, ]}>This Month</Text>
                             </TouchableOpacity>
                         </View>
-                        <View style={styles.statBubble}>
+                        <View style={[styles.statBubble, weekMonthYear == 2? styles.acticeColor : ""]}>
                             <TouchableOpacity
                             onPress={() => {setWeekMonthYear(2)}}
                             >
-                                <Text style={styles.statTextColor}>This Year</Text>
+                                <Text style={[weekMonthYear == 2? {color: "black"} : styles.statTextColor, styles.statFont]}>This Year</Text>
                             </TouchableOpacity>
                         </View>
                 </View>
-                <View style={{flex: 1, flexDirection: "row", margin: 5}}>
+                <View style={{flex: 1, flexDirection: "row", margin: 5, marginTop: 0}}>
                     <View style={styles.statBubble}>
                             <View style={styles.statBubbleTop}>
-                                <Ionicons name="time" size={40} color="black"  /><Text style={[styles.statBubbleHeader, styles.statTextColor]}>Time Practiced</Text>
+                                <Ionicons name="time" size={30} color="white"  /><Text style={[styles.statBubbleHeader, styles.statTextColor]}>Time Practiced</Text>
                             </View>
                             <View>
-                                <Text style={[{fontSize: 20, marginLeft:5}, styles.statTextColor]}>{Math.round((timePracticed + Number.EPSILON) * 100) / 100} hrs</Text>
+                                <Text style={[{fontSize: 18, marginLeft:5}, styles.statTextColor]}>{Math.round((timePracticed + Number.EPSILON) * 100) / 100} hrs</Text>
                             </View>
                     </View>
                     <View style={styles.statBubble}>
                         <View style={styles.statBubbleTop}>
-                            <Ionicons name="checkmark" size={40} color="green" /><Text style={[styles.statBubbleHeader, styles.statTextColor]}>Average Quality</Text>
+                            <Ionicons name="checkmark" size={30} color="green" /><Text style={[styles.statBubbleHeader, styles.statTextColor]}>Average Quality</Text>
                         </View>
                         <View>
                             <Text style={[{fontSize: 20, marginLeft: 5}, styles.statTextColor]} >{Math.round((averageQuality + Number.EPSILON) * 100) / 100}</Text>
@@ -379,6 +382,9 @@ const MainPage = ({navigation})  => {
 
                     }
                 </View>
+                <View style={styles.practiceSessionHeader}> 
+                    <Text style={[styles.statText, styles.practiceSessionHeaderText]}>Practice Session</Text>
+                </View>
                 {
                     thisMonthsSessions?
                     thisMonthsSessions.map((data, index) => 
@@ -387,9 +393,13 @@ const MainPage = ({navigation})  => {
                                     onPress={() => {navigation.navigate(('EditPracticePage'), {data : data})}}
                             >                  
                             <View style={styles.sessions}>
-                                    <Text style={{fontSize: 25, color: 'white'}}>Practice Session {makeDateLookNice(data.date)} <TouchableOpacity onPress={() => {deleteFromArray(data.date)}} ><Ionicons name="trash-sharp" size={24} color="white" /></TouchableOpacity></Text>
-                                    <Text style={{color: "white"}}>{data.practiceTime} mins</Text>
-                               
+                                    <View style={{flex: 1, flexDirection: "row"}}>
+                                        <Text style={{fontSize: 25, color: 'white', flex: 0.5}}>{makeDateLookNice(data.date)}</Text>
+                                        <View style={{alignItems: "flex-end", flex: 0.5}}>
+                                            <TouchableOpacity onPress={() => {deleteFromArray(data.date)}} ><Ionicons name="trash-sharp" size={24} color="white" /></TouchableOpacity>
+                                        </View>
+                                    </View>
+                                    <Text style={{color: "white", fontSize: 15}}>{data.practiceTime} mins</Text>
                             </View>
                             </TouchableOpacity>
                     </View>
@@ -421,7 +431,6 @@ const styles = StyleSheet.create({
     },
     sessions : {
         backgroundColor: "#15243b",
-        // backgroundColor: "#5F7CA6",
         borderWidth: 1,
         margin: 10,
         padding: 5,
@@ -450,12 +459,15 @@ const styles = StyleSheet.create({
         backgroundColor: "#15243b",
         flex: 0.5,
         margin: 10,
-        padding: 5,
+        padding: 6,
         borderRadius: 15
     },
     statBubbleTop: {
         flexDirection: "row",
         alignItems :"center",
+    },
+    acticeColor: {
+        backgroundColor: "white"
     },
     statBubbleHeader: {
         fontSize: 21,
@@ -468,5 +480,15 @@ const styles = StyleSheet.create({
         marginTop: 5,
         marginBottom: 0,
         marginLeft: 20
+    },
+    statFont: {
+        fontSize : 18
+    },
+    practiceSessionHeader:{
+        margin: 10,
+        padding: 5
+    },
+    practiceSessionHeaderText: {
+        fontSize: 25
     }
 });

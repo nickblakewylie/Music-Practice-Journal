@@ -138,12 +138,12 @@ function AddPractice() {
                                 <Text style={styles.practiceSessionTitle}>Practice Session</Text>
                             </View>
                             <View>
-                                <Text style={styles.inputHeader}>Practice Time (mins)</Text>
+                                <Text style={styles.inputHeader}>Time (mins)</Text>
                                 <TextInput 
                                     style={styles.practiceInfoText}
                                     onChangeText={setPracticeTime}
                                     value={practiceTime ? practiceTime.toString() : practiceTime}
-                                    placeholder="Enter Time"
+                                    placeholder="Enter Time of Session"
                                     placeholderTextColor="gray"
                                     keyboardType="number-pad"
                                  />
@@ -439,7 +439,6 @@ const styles = StyleSheet.create({
     },
     rightSide:{
         right: 0,
-        // "#1F3659"
         backgroundColor: "#E8DCB8"
     },
     exitButtonsStyle: {
