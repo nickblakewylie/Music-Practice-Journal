@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect, useContext } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, Animated, Modal, Alert, Pressable, TextInput, Button, Dimensions, Keyboard, TouchableWithoutFeedback, Easing} from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Animated, Modal, Alert, Pressable, TextInput, Button, Dimensions, Keyboard, TouchableWithoutFeedback, Easing, TouchableHighlight} from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
 import { Camera } from 'expo-camera';
 import { Video, AVPlaybackStatus } from 'expo-av';
@@ -53,28 +53,56 @@ function AddPractice() {
         })();
       }, []);
 
-      const donwloadFile = async () => {
-        setDownloading(true)
-        const groupsDir = FileSystem.documentDirectory + "videos/";
-        let getInfo = await FileSystem.getInfoAsync(groupsDir);
-        if(!getInfo.exists){
-          await FileSystem.makeDirectoryAsync(FileSystem.documentDirectory + 'videos/',{intermediates: true});
+      function checkInputsAreCorrect(){
+          if(practiceTime != null &&  Number.isInteger(Number(practiceTime)) && Number(practiceTime) > 0 && Number(practiceTime) < 1000){
+              if( quality != null && Number.isInteger(Number(quality)) && Number(quality) > 0 && Number(quality) < 11){
+                  return true
+              }else{
+                Alert.alert("Quality of session required", "Enter a number 1 - 10", [{
+                    text : "OK"
+                }]) 
+                return false
+              }
+          }else{
+              Alert.alert("Practice time required", "Enter a time 1 - 500", [{
+                  text : "OK"
+              }])
+              return false
+          }
+      }
+      function deleteVideoUri(){
+          setVideoUri(null);
+          setDownloadedVid(null);
+      }
+      const downloadFile = async () => {
+        if(checkInputsAreCorrect()){
+            setDownloading(true)
+            if(videoUri != null){
+                const groupsDir = FileSystem.documentDirectory + "videos/";
+                let getInfo = await FileSystem.getInfoAsync(groupsDir);
+                if(!getInfo.exists){
+                await FileSystem.makeDirectoryAsync(FileSystem.documentDirectory + 'videos/',{intermediates: true});
+                }
+                const fileName = FileSystem.documentDirectory + "videos/"+ uuid.v4() +".mov"
+                await FileSystem.moveAsync({
+                from: videoUri,
+                to: fileName
+                });
+                console.log(fileName)
+                setDownloadedVid(fileName)
+                await storePracticeSession(fileName)
+            }
+            else{
+                await storePracticeSession(null)
+            }
+            setDownloading(false)
+            setModalVisible(false)
+            setVideoUri(null);
+            setPracticeTime(null)
+            setDownloadedVid(null);
+            setNotes(null);
+            setQuality(null);
         }
-        const fileName = FileSystem.documentDirectory + "videos/"+ uuid.v4() +".mov"
-        await FileSystem.moveAsync({
-          from: videoUri,
-          to: fileName
-        });
-        console.log(fileName)
-        setDownloadedVid(fileName)
-        await storePracticeSession(fileName)
-        setDownloading(false)
-        setModalVisible(false)
-        setVideoUri(null);
-        setPracticeTime(null)
-        setDownloadedVid(null);
-        setNotes(null);
-        setQuality(null);
       }
     const storePracticeSession = async (newFileName) => {
         var getPracticeSession = await AsyncStorage.getItem('practiceSessions');
@@ -146,6 +174,7 @@ function AddPractice() {
                                     placeholder="Enter Time of Session"
                                     placeholderTextColor="gray"
                                     keyboardType="number-pad"
+                                    maxLength={3}
                                  />
                             </View>
                             <View >
@@ -176,6 +205,12 @@ function AddPractice() {
                                 
                             { videoUri ?
                             <View style={styles.myVideoContainer}>
+                                <Pressable
+                                     onPress={() => deleteVideoUri()}
+                                     style={styles.deleteRecordedVideoButton}
+                                >
+                                    <Text style={{fontSize: 25, color: "red"}}>X</Text>
+                                </Pressable>
                                 <Video
                                     ref={video}
                                     style={styles.video}
@@ -199,7 +234,7 @@ function AddPractice() {
                                     >
                                         <View style={styles.myVideoContainer}>
                                             <Ionicons name="camera"  size={40} color="black" style={{textAlign: "center"}}/>
-                                            <Text style={{textAlign:"center"}}>Take Video</Text>
+                                            <Text style={{textAlign:"center"}}>Take Video (optional) </Text>
                                         </View>
                                     </TouchableOpacity>
                             }
@@ -220,7 +255,7 @@ function AddPractice() {
                                 </Pressable>
                                 <View style={[styles.exitSaveButtons, styles.rightSide]}>
                                     <TouchableOpacity
-                                        onPress={donwloadFile}
+                                        onPress={downloadFile}
                                         >
                                         { downloading?
                                             <Text style={styles.exitButtonsStyle}>Downloading</Text>
@@ -444,5 +479,17 @@ const styles = StyleSheet.create({
     exitButtonsStyle: {
         fontSize: 18,
         textAlign: "center"
+    },
+    deleteRecordedVideoButton : {
+        position: "absolute",
+        top: 0,
+        right: 0,
+        width: 35,
+        height: 35,
+        backgroundColor: "white",
+        zIndex: 100,
+        justifyContent:"center",
+        alignItems: "center",
+        borderTopRightRadius: 15
     }
   });

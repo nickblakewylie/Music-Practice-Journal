@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useContext} from 'react'
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Dimensions, Button} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Dimensions, Button, Platform} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Video } from 'expo-av';
 import {PracticeSessions} from '../PracticeSessions'
@@ -308,7 +308,7 @@ const MainPage = ({navigation})  => {
     }
     if(practiceSessions != null){
         return(
-            <ScrollView style={{backgroundColor: "#1F3659"}}  contentInset={{bottom:50}} >
+            <ScrollView style={{backgroundColor: "#1F3659", marginBottom: 50}} automaticallyAdjustContentInsets={true}>
                 <View style={{flex: 1, flexDirection: "row", margin: 5, marginBottom: 0}}>
                         <View style={[styles.statBubble, weekMonthYear == 0? styles.acticeColor : ""]}>
                             <TouchableOpacity 
