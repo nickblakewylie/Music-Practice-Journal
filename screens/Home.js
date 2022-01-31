@@ -87,7 +87,7 @@ const MainPage = ({navigation})  => {
         const tempD = new Date(currentDay)
         for(var i = 0; i < weekDays.length; i ++){
             if(tempD.getDate() == weekDays[i]){
-                console.log("this is true")
+                // console.log("this is true")
                 return true
             }
         }
@@ -96,8 +96,8 @@ const MainPage = ({navigation})  => {
         if(currentMonth != null && practiceSessions != null && practiceSessions.length > 0 ){
             // show Week bit tricky will work on it later
             var weekDays = getDayNumbersPastWeek()
-            console.log(weekDays)
-            console.log("trying to get this months practice sessions")
+            // console.log(weekDays)
+            // console.log("trying to get this months practice sessions")
             if(weekMonthYear == 0){
                 var week  = practiceSessions.filter(el => checkIfDateInWeekArray(el.date, weekDays) == true)
                 setThisMonthsSessions(week)
@@ -114,7 +114,7 @@ const MainPage = ({navigation})  => {
             }
         }
         else{
-            console.log("practice Sessions deleted")
+            // console.log("practice Sessions deleted")
             setThisMonthsSessions(null)
         }
     }
@@ -131,18 +131,20 @@ const MainPage = ({navigation})  => {
             var timePracticed = 0;
             var quality = 0;
             var amountOfSession = 0;
-            for(var i = 0; i < practiceSessions.length; i ++){
-                var pDate = months[new Date(practiceSessions[i].date).getMonth()]
-                if(pDate == currentMonth){
-                    if(Number(practiceSessions[i].practiceTime) != null){
-                        timePracticed += Number(practiceSessions[i].practiceTime)
+            for(var i = 0; i < thisMonthsSessions.length; i ++){
+                // var pDate = months[new Date(practiceSessions[i].date).getMonth()]
+                // if(pDate == currentMonth){
+                    if(Number(thisMonthsSessions[i].practiceTime) != null){
+                        timePracticed += Number(thisMonthsSessions[i].practiceTime)
                     }
-                    if(Number(practiceSessions[i].quality) != null){
+                    if(Number(thisMonthsSessions[i].quality) != null){
                         amountOfSession ++;
-                        quality += Number(practiceSessions[i].quality)
+                        quality += Number(thisMonthsSessions[i].quality)
                     }
-                }
+                // }
             }
+            console.log("time practiced changed")
+            console.log(timePracticed)
             setTimePracticed(timePracticed / 60)
             if(amountOfSession > 0){
                 setAverageQuality(quality / amountOfSession);
@@ -158,21 +160,23 @@ const MainPage = ({navigation})  => {
     }
     useEffect(() => {
         updatePracticeSessionStorage()
-        getTimePracticed()
+        // getTimePracticed()
         getThisMonthsPracticeSessions()
     }, [practiceSessions])
     useEffect(() => {
-        getTimePracticed()
+        // getTimePracticed()
         getThisMonthsPracticeSessions()
     }, [currentMonth])
     useEffect(() => {
+        getTimePracticed()
         calculateChartData()
     }, [thisMonthsSessions])
     useEffect(() => {
+        // getTimePracticed()
         getThisMonthsPracticeSessions()
     }, [weekMonthYear])
     useEffect(() => {
-        console.log("loaded")
+        // console.log("loaded")
         getThisMonthsPracticeSessions()
     }, [])
     function getDaysInMonth(month, year){
@@ -247,7 +251,7 @@ const MainPage = ({navigation})  => {
             }else if(weekMonthYear == 1){
                 for(var i = 1; i < daysInMonth; i++){
                     const y = findPracticeSessionForDay(i,months.indexOf(currentMonth), year)
-                    console.log(y)
+                    // console.log(y)
                     tempData.push({x: i , y : y})
                 }
                 // year
@@ -258,7 +262,7 @@ const MainPage = ({navigation})  => {
                         tempMonth = "0" + tempMonth
                     }
                     const dateS = new Date(year.toString() + "-" + tempMonth + "-01")
-                    console.log(dateS)
+                    // console.log(dateS)
                     tempData.push({x : dateS, y: findPracticeTimeForMonth(monthCount, year)})
                 }
             }
