@@ -11,4 +11,6 @@ When you are done inputing the information for the practice session click on the
 ## Home Screen
 ### Overview
 This page shows the user all their practice sessions organized from last week, this month, and this year.  This page also gives the user helpful stats, time practiced, average quality of each session and a graph of practice times.
+### Details
+Using the react context called practice sessions, which gets all the practice sesssion from local storage, the page will retrieve all the sessions associated with either last week, this month, or this year.  Using this information the amount of practice time is calculated and put into a chart
 
