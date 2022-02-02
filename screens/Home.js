@@ -48,6 +48,8 @@ const Home = () => {
 }
 const MainPage = ({navigation})  => {
     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September','October', 'November', 'December']
+    const shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec']
+    const weekday = ["Sun","Mon","Tue","Wed","Thur","Fri","Sat"];
     const [timePracticed, setTimePracticed] = useState(null);
     const {practiceSessions, setPracticeSessions} = useContext(PracticeSessions)
     const [currentMonth, setCurrentMonth] = useState(months[new Date().getMonth()])
@@ -65,28 +67,44 @@ const MainPage = ({navigation})  => {
         const tempArray = (practiceSessions => practiceSessions.filter((el) => el.date !== date))
         setPracticeSessions(tempArray)
     }
+    Date.prototype.addDays = function(days) {
+        var date = new Date(this.valueOf());
+        date.setDate(date.getDate() + days);
+        return date;
+    }
+    Date.prototype.subtractDays = function(days) {
+        var date = new Date(this.valueOf());
+        date.setDate(date.getDate() - days);
+        return date;
+    }
     function getDayNumbersPastWeek(){
-        var d = new Date().getDate()
-        if(d > 7){
-            return [d, d-1, d-2, d - 3, d -4, d-5, d-6]
-        }else{
-            const pastMonth = months.indexOf(currentMonth)
-            const daysInPastMonth = getDaysInMonth(pastMonth, new Date().getFullYear())
-            const difference = Math.abs(d - 7);
-            var newArray = []
-            for(var i = daysInPastMonth + difference; i < daysInPastMonth ; i++){
-                newArray.push({day : i, month : pastMonth})
-            }
-            for(var j = 0; j < d;j ++){
-                newArray.push({day:i, month: pastMonth + 1})
-            }
-            return newArray
-        }
+        var date = new Date()
+        // if(d > 7){
+        //     return [d, d-1, d-2, d - 3, d -4, d-5, d-6]
+        // }else{
+        //     const pastMonth = months.indexOf(currentMonth) - 1
+        //     if (pastMonth  == 11){
+        //         pastMonth = 0
+        //     }
+        //     const daysInPastMonth = getDaysInMonth(pastMonth, new Date().getFullYear())
+        //     const difference = d - 6;
+        //     var newArray = []
+        //     for(var i = daysInPastMonth + difference; i <= daysInPastMonth ; i++){
+        //         newArray.push({day : i, month : pastMonth})
+        //     }
+        //     for(var j = 1; j <= d;j ++){
+        //         newArray.push({day:j, month: pastMonth + 1})
+        //     }
+        //     return newArray
+        // }
+        // var result = new Da
+        return [date.subtractDays(6),date.subtractDays(5),date.subtractDays(4),date.subtractDays(3),date.subtractDays(2),date.subtractDays(1), date]
     }
     function checkIfDateInWeekArray(currentDay, weekDays){
         const tempD = new Date(currentDay)
         for(var i = 0; i < weekDays.length; i ++){
-            if(tempD.getDate() == weekDays[i]){
+            var weekDay = new Date(weekDays[i])
+            if(tempD.getDate() == weekDay.getDate() && tempD.getFullYear() ==  weekDay.getFullYear() &&  tempD.getMonth() == weekDay.getMonth()){
                 // console.log("this is true")
                 return true
             }
@@ -96,15 +114,14 @@ const MainPage = ({navigation})  => {
         if(currentMonth != null && practiceSessions != null && practiceSessions.length > 0 ){
             // show Week bit tricky will work on it later
             var weekDays = getDayNumbersPastWeek()
-            // console.log(weekDays)
-            // console.log("trying to get this months practice sessions")
             if(weekMonthYear == 0){
+                console.log(weekDays)
                 var week  = practiceSessions.filter(el => checkIfDateInWeekArray(el.date, weekDays) == true)
                 setThisMonthsSessions(week)
             }
             else if(weekMonthYear == 1){
                 // show Month
-                var t = practiceSessions.filter(el => months[new Date(el.date).getMonth()] == currentMonth)
+                var t = practiceSessions.filter(el => (months[new Date(el.date).getMonth()] == currentMonth && new Date(el.date).getFullYear() == new Date().getFullYear()))
                 setThisMonthsSessions(t)
             }
             // show Year
@@ -131,20 +148,22 @@ const MainPage = ({navigation})  => {
             var timePracticed = 0;
             var quality = 0;
             var amountOfSession = 0;
-            for(var i = 0; i < thisMonthsSessions.length; i ++){
-                // var pDate = months[new Date(practiceSessions[i].date).getMonth()]
-                // if(pDate == currentMonth){
-                    if(Number(thisMonthsSessions[i].practiceTime) != null){
-                        timePracticed += Number(thisMonthsSessions[i].practiceTime)
-                    }
-                    if(Number(thisMonthsSessions[i].quality) != null){
-                        amountOfSession ++;
-                        quality += Number(thisMonthsSessions[i].quality)
-                    }
-                // }
+            if(thisMonthsSessions != null){
+                for(var i = 0; i < thisMonthsSessions.length; i ++){
+                    // var pDate = months[new Date(practiceSessions[i].date).getMonth()]
+                    // if(pDate == currentMonth){
+                        if(Number(thisMonthsSessions[i].practiceTime) != null){
+                            timePracticed += Number(thisMonthsSessions[i].practiceTime)
+                        }
+                        if(Number(thisMonthsSessions[i].quality) != null){
+                            amountOfSession ++;
+                            quality += Number(thisMonthsSessions[i].quality)
+                        }
+                    // }
+                }
             }
-            console.log("time practiced changed")
-            console.log(timePracticed)
+            // console.log("time practiced changed")
+            // console.log(timePracticed)
             setTimePracticed(timePracticed / 60)
             if(amountOfSession > 0){
                 setAverageQuality(quality / amountOfSession);
@@ -228,46 +247,40 @@ const MainPage = ({navigation})  => {
         const theDay = new Date().getDate()
         const year = new Date().getFullYear()
         const daysInMonth = getDaysInMonth(months.indexOf(currentMonth), year);
+        const theCurrentDate = new Date()
         var tempData = []
-        if(practiceSessions != null){
+        if(practiceSessions != null && thisMonthsSessions != null){
             // week selected
             if(weekMonthYear == 0){
-                if(theDay > 6){
-                    for(var i = theDay - 6; i <= theDay; i ++){
-                        tempData.push({x: Math.floor(i), y: findPracticeSessionForDay(i,months.indexOf(currentMonth), year)})
-                    }
-                }
-                // this is for the case that it is beginning of month
-                else{
-                    var otherMonth = months.indexOf(currentMonth);
-                    var newY = year
-                    if(otherMonth == -1){
-                        newY = newY - 1;
-                        otherMonth = 11
-                    }
-                // using 0 indexed months
-                }
-                // month 
+                tempData.push({x : weekday[theCurrentDate.subtractDays(6).getDay()], y: findPracticeSessionForDay(theCurrentDate.subtractDays(6).getDate(),theCurrentDate.subtractDays(6).getMonth(), theCurrentDate.subtractDays(6).getFullYear())})
+                tempData.push({x : weekday[theCurrentDate.subtractDays(5).getDay()],y: findPracticeSessionForDay(theCurrentDate.subtractDays(5).getDate(),theCurrentDate.subtractDays(5).getMonth(), theCurrentDate.subtractDays(5).getFullYear())})
+                tempData.push({x : weekday[theCurrentDate.subtractDays(4).getDay()],y: findPracticeSessionForDay(theCurrentDate.subtractDays(4).getDate(),theCurrentDate.subtractDays(4).getMonth(), theCurrentDate.subtractDays(4).getFullYear()) })
+                tempData.push({x : weekday[theCurrentDate.subtractDays(3).getDay()], y: findPracticeSessionForDay(theCurrentDate.subtractDays(3).getDate(),theCurrentDate.subtractDays(3).getMonth(), theCurrentDate.subtractDays(3).getFullYear())})
+                tempData.push({x : weekday[theCurrentDate.subtractDays(2).getDay()], y: findPracticeSessionForDay(theCurrentDate.subtractDays(2).getDate(),theCurrentDate.subtractDays(2).getMonth(), theCurrentDate.subtractDays(2).getFullYear())})
+                tempData.push({x : weekday[theCurrentDate.subtractDays(1).getDay()], y: findPracticeSessionForDay(theCurrentDate.subtractDays(1).getDate(),theCurrentDate.subtractDays(1).getMonth(), theCurrentDate.subtractDays(1).getFullYear())})
+                tempData.push({x : weekday[theCurrentDate.getDay()],y: findPracticeSessionForDay(theCurrentDate.getDate(),theCurrentDate.getMonth(), theCurrentDate.getFullYear())})
             }else if(weekMonthYear == 1){
                 for(var i = 1; i < daysInMonth; i++){
                     const y = findPracticeSessionForDay(i,months.indexOf(currentMonth), year)
                     // console.log(y)
                     tempData.push({x: i , y : y})
                 }
-                // year
-            }else{
+            //     // year
+            }else if(weekMonthYear == 2){
                 for(var monthCount = 0; monthCount < 12; monthCount ++){
-                    var tempMonth = monthCount + 1;
-                    if( tempMonth < 10){
-                        tempMonth = "0" + tempMonth
+                    var newMonthS = monthCount.toString()
+                    if( monthCount < 10){
+                        newMonthS= "0" + monthCount
                     }
-                    const dateS = new Date(year.toString() + "-" + tempMonth + "-01")
+                    // const dateS = 
+                    var dateString = year.toString() + "-" + newMonthS + "-01"
+                    const dateS = new Date(year.toString() + "-" + newMonthS + "-01")
                     // console.log(dateS)
-                    tempData.push({x : dateS, y: findPracticeTimeForMonth(monthCount, year)})
+                    tempData.push({x : shortMonths[monthCount], y: findPracticeTimeForMonth(monthCount, year)})
                 }
             }
+            setChartData(tempData)
         }
-        setChartData(tempData)
     }
     const chartTheme = {
         // axis: {
@@ -293,7 +306,7 @@ const MainPage = ({navigation})  => {
                 },
                 axisLabel: {
                     fill: "white",
-                    padding: 32
+                    padding: 36
                 },
                 grid: {
                     stroke: "transparent",
@@ -308,7 +321,7 @@ const MainPage = ({navigation})  => {
     }
     if(practiceSessions != null){
         return(
-            <ScrollView style={{backgroundColor: "#1F3659", marginBottom: 50}} automaticallyAdjustContentInsets={true}>
+            <ScrollView style={{backgroundColor: "#1F3659", marginBottom: 80}} automaticallyAdjustContentInsets={false}>
                 <View style={{flex: 1, flexDirection: "row", margin: 5, marginBottom: 0}}>
                         <View style={[styles.statBubble, weekMonthYear == 0? styles.acticeColor : ""]}>
                             <TouchableOpacity 
@@ -361,22 +374,18 @@ const MainPage = ({navigation})  => {
                         <VictoryChart
                         width={400}
                         height={230}
-                        data={chartData}
+                        // data={chartData}
                         theme={chartTheme}
                         >
-                        <VictoryAxis dependentAxis label="Time (mins)"/>
-                        <VictoryAxis label="Date" />
-                        {/* <VictoryLabel
-                            x={25}
-                            y={25}
-                            text="Practice Time this Month"
-                            style={{color: "white"}}
-                        /> */}
+                        <VictoryAxis dependentAxis={true} label="Time (mins)"/>
+                        { weekMonthYear == 1?
+                        <VictoryAxis label={currentMonth}  /> : <VictoryAxis /> 
+                        }
                         <VictoryBar
                             data={chartData}
-                            // x="x"
-                            // y="y"
-                            style={{data: {stroke: "gray",fill: "#5F7CA6", width: 8}}}
+                            style={{data: {stroke: "gray",fill: "#5F7CA6", width: 10}}}
+                            // labels={datum => datum.toString()}
+                            // labelComponent={<VictoryLabel y={250} verticalAnchor={"start"} />}
                         />
                         </VictoryChart>
                     </View>: 
