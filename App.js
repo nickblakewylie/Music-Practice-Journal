@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Text, View, StyleSheet, ImageBackground, Image } from 'react-native';
+import { Text, View, StyleSheet, ImageBackground, Image, TouchableOpacity, Button } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
@@ -8,6 +8,9 @@ import AddPractice from './screens/AddPractice';
 import Home from './screens/Home';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Header from './components/Header';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
+import PracticeSession from './components/PracticeSession';
 // function HomeScreen() {
 //   return (
 //     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -15,10 +18,10 @@ import Header from './components/Header';
 //     </View>
 //   );
 // }
-function Search() {
+function SetList() {
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Search</Text>
+      <Text>Your Set List</Text>
     </View>
   );
 }
@@ -31,6 +34,44 @@ function BookShelf(){
 }
 const Tab = createBottomTabNavigator();
 
+function HomeTabs({route}){
+  const routeName = getFocusedRouteNameFromRoute(route) ?? 'Home';
+  return(
+    <Tab.Navigator
+    screenOptions={({ route }) => ({
+      tabBarIcon: ({ focused, color, size }) => {
+        let iconName;
+
+        if (route.name === 'Home') {
+          iconName = focused ? 'ios-home-sharp': 'ios-home-outline';
+        } else if (route.name === 'Set List') {
+          iconName = focused ?'list': 'list-outline';
+        } else if (route.name === 'Add Practice'){
+          iconName = focused ? 'add' : 'add-outline';
+        }
+
+        // You can return any component that you like here!
+        return <Ionicons name={iconName} size={size} color={color} />;
+      },
+      tabBarActiveTintColor: '#1F3659',
+      tabBarInactiveTintColor: 'gray',
+      tabBarStyle: { position: 'absolute' },
+      tabBarBackground: () => (
+        <View style={styles.absoluteFill} />
+      ),
+      headerStyle:{backgroundColor: "#E8DCB8"}
+    })}
+  >
+    <Tab.Screen name="Add Practice" options={{headerTitle: () => <Header name="Music Tracker" />}}  component={AddPractice} />
+    <Tab.Screen name="Home" component={Home} options={{
+      headerTitle: () => <Header name="Home" /> 
+    }} />
+    <Tab.Screen name="Set List" options={{headerTitle: () => <Header name="Set List" />}}  component={SetList} />
+  </Tab.Navigator>
+  )
+
+}
+const RootStack = createNativeStackNavigator();
 export default function App() {
   const [practiceSessions, setPracticeSessions] = React.useState(null);
   const providerValue = React.useMemo(() => ({practiceSessions, setPracticeSessions}), [practiceSessions, setPracticeSessions]);
@@ -47,35 +88,33 @@ export default function App() {
   return (
     <NavigationContainer>
       <PracticeSessions.Provider value={providerValue}>
-      <Tab.Navigator
-        screenOptions={({ route }) => ({
-          tabBarIcon: ({ focused, color, size }) => {
-            let iconName;
-
-            if (route.name === 'Home') {
-              iconName = focused ? 'ios-home-sharp': 'ios-home-outline';
-            } else if (route.name === 'Search') {
-              iconName = 'ios-search-sharp';
-            } else if (route.name === 'Add Practice'){
-              iconName = focused ? 'add' : 'add-outline';
-            }
-
-            // You can return any component that you like here!
-            return <Ionicons name={iconName} size={size} color={color} />;
-          },
-          tabBarActiveTintColor: '#1F3659',
-          tabBarInactiveTintColor: 'gray',
-          tabBarStyle: { position: 'absolute' },
-          tabBarBackground: () => (
-            <View style={styles.absoluteFill} />
-          ),
-          headerStyle:{backgroundColor: "#E8DCB8"}
-        })}
-      >
-        <Tab.Screen name="Add Practice" options={{headerTitle: () => <Header name="Music Tracker" />}}  component={AddPractice} />
-        <Tab.Screen name="Home" component={Home} options={{headerShown: false}} />
-        <Tab.Screen name="Search" options={{headerTitle: () => <Header name="Search" />}}  component={Search} />
-      </Tab.Navigator>
+        <RootStack.Navigator>
+          <RootStack.Screen name="HomePage" component={HomeTabs} options={{headerShown: false}}/>
+          <RootStack.Screen name="EditPracticePage" component={PracticeSession} options={({navigation}) => ({
+                    // headerTitle: () => <Header name="Edit Practice" withBack="true"/> ,
+                    // headerTitleAlign:"center",
+                    // headerTitleVisible: false,
+                    // headerBackVisible:false,
+                    // headerBackTitleVisible:false,
+                    // headerLeft: () => (
+                    //     <TouchableOpacity
+                    //         onPress={() => navigation.navigate('Main')}
+                    //         style={{position: "absolute"}}
+                    //     >
+                    //         <Ionicons name="arrow-back" size={24} color="black" />
+                    //     </TouchableOpacity>
+                    // ),
+                    // headerRight: () => (
+                    //   <TouchableOpacity 
+                    //       >
+                    //       <Ionicons name="pencil" size={24} color="black" />
+                    //   </TouchableOpacity>
+                    // ),
+                    // headerStyle:{backgroundColor: "#E8DCB8"}
+                    headerShown: false
+                })}
+                />
+        </RootStack.Navigator>
       </PracticeSessions.Provider>
     </NavigationContainer>
   );

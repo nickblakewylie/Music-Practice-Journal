@@ -17,17 +17,16 @@ const Home = () => {
         <Stack.Navigator
             screenOptions={{
                 headerBackVisible: false,
-                headerStyle:{backgroundColor: "#E8DCB8"},
+                headerStyle:{backgroundColor: "#E8DCB8"}
             }}
             >
             <Stack.Screen
             name="Main"
             component={MainPage}
-            options={{headerTitle: () => <Header name="Practice Sessions"/> }}
-            
+            options={{headerShown: false }}
             >
             </Stack.Screen>
-            <Stack.Screen
+            {/* <Stack.Screen
                 name="EditPracticePage"
                 component={PracticeSession}
                 options={({navigation}) => ({
@@ -39,14 +38,14 @@ const Home = () => {
                         >
                             <Ionicons name="arrow-back" size={24} color="black" />
                         </TouchableOpacity>
-                    )
+                    ),
                 })}
             >
-            </Stack.Screen>
+            </Stack.Screen> */}
         </Stack.Navigator>
     )
 }
-const MainPage = ({navigation})  => {
+const MainPage = ({navigation, route})  => {
     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September','October', 'November', 'December']
     const shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec']
     const weekday = ["Sun","Mon","Tue","Wed","Thur","Fri","Sat"];
@@ -58,6 +57,7 @@ const MainPage = ({navigation})  => {
     const [chartData, setChartData] = useState(null)
     // weekMonthYear 0 = week, 1 = month, 2 = year
     const [weekMonthYear, setWeekMonthYear] = useState(0)
+    const [updated, setUpdated] = useState(0)
     function makeDateLookNice(date){
         var myDate = new Date(date)
         const nicelookingDate = months[myDate.getMonth()] + " " + myDate.getDate() + ", " + myDate.getFullYear() 
@@ -115,7 +115,6 @@ const MainPage = ({navigation})  => {
             // show Week bit tricky will work on it later
             var weekDays = getDayNumbersPastWeek()
             if(weekMonthYear == 0){
-                console.log(weekDays)
                 var week  = practiceSessions.filter(el => checkIfDateInWeekArray(el.date, weekDays) == true)
                 setThisMonthsSessions(week)
             }
@@ -134,6 +133,7 @@ const MainPage = ({navigation})  => {
             // console.log("practice Sessions deleted")
             setThisMonthsSessions(null)
         }
+        setUpdated(Math.random() *1000);
     }
     function deleteFromArray(date){
         deletePracticeSession(date)
@@ -177,6 +177,16 @@ const MainPage = ({navigation})  => {
         const niceDate = myDate.getFullYear() + "-" + myDate.getMonth() + 1 + "-" + myDate.getDate()
         return niceDate
     }
+    // useEffect(() =>{
+    //     updatePracticeSessionStorage()
+    //     getThisMonthsPracticeSessions()
+    //     console.log("called")
+    // }, [updated != null])
+    useEffect(() => {
+        updatePracticeSessionStorage()
+        getThisMonthsPracticeSessions()
+        console.log("updated")
+    }, [route.params])
     useEffect(() => {
         updatePracticeSessionStorage()
         // getTimePracticed()
@@ -189,6 +199,7 @@ const MainPage = ({navigation})  => {
     useEffect(() => {
         getTimePracticed()
         calculateChartData()
+        console.log("months sessions updated")
     }, [thisMonthsSessions])
     useEffect(() => {
         // getTimePracticed()
@@ -276,28 +287,13 @@ const MainPage = ({navigation})  => {
                     var dateString = year.toString() + "-" + newMonthS + "-01"
                     const dateS = new Date(year.toString() + "-" + newMonthS + "-01")
                     // console.log(dateS)
-                    tempData.push({x : shortMonths[monthCount], y: findPracticeTimeForMonth(monthCount, year)})
+                    tempData.push({x : shortMonths[monthCount], y: Math.round((findPracticeTimeForMonth(monthCount, year) / 60 + Number.EPSILON) * 100) / 100})
                 }
             }
             setChartData(tempData)
         }
     }
     const chartTheme = {
-        // axis: {
-        //     style: {
-        //       tickLabels: {
-        //         // this changed the color of my numbers to white
-        //         fill: 'white',
-        //       },
-        //       grid : {
-        //           stroke : "transparent"
-        //       },
-        //       dependentAxis: {
-        //           fill: "purple"
-        //       },
-              
-        //     },
-        //   },
         axis: {
             style: {
                 tickLabels: {
@@ -377,7 +373,7 @@ const MainPage = ({navigation})  => {
                         // data={chartData}
                         theme={chartTheme}
                         >
-                        <VictoryAxis dependentAxis={true} label="Time (mins)"/>
+                        <VictoryAxis dependentAxis={true} label={weekMonthYear != 2 ? "Time (mins)": "Time (hrs)"}/>
                         { weekMonthYear == 1?
                         <VictoryAxis label={currentMonth}  /> : <VictoryAxis /> 
                         }
@@ -406,13 +402,14 @@ const MainPage = ({navigation})  => {
                                     onPress={() => {navigation.navigate(('EditPracticePage'), {data : data})}}
                             >                  
                             <View style={styles.sessions}>
-                                    <View style={{flex: 1, flexDirection: "row"}}>
-                                        <Text style={{fontSize: 25, color: 'white', flex: 0.5}}>{makeDateLookNice(data.date)}</Text>
-                                        <View style={{alignItems: "flex-end", flex: 0.5}}>
-                                            <TouchableOpacity onPress={() => {deleteFromArray(data.date)}} ><Ionicons name="trash-sharp" size={24} color="white" /></TouchableOpacity>
+                                    <View style={{flex: 1, flexDirection: "row", justifyContent:"center"}}>
+                                        <Text style={{fontSize: 22, color: 'white', flex: 0.8, alignSelf:"center", paddingLeft:10}}>{makeDateLookNice(data.date)}</Text>
+                                        <View style={{alignItems: "center", flex: 0.2, backgroundColor:"white",alignContent:"center",justifyContent:"center", borderTopRightRadius:9,borderBottomRightRadius:9,borderWidth:1}}>
+                                            <Text style={{color: "black", fontSize: 22, textAlign:"center",fontWeight:"600"}}>{data.practiceTime}</Text>
+                                            <Text style={{color: "black", fontSize: 22, textAlign:"center", fontWeight:"600"}}> mins</Text>
                                         </View>
                                     </View>
-                                    <Text style={{color: "white", fontSize: 15}}>{data.practiceTime} mins</Text>
+                                    {/* <Text style={{color: "white", fontSize: 15}}>{data.practiceTime} mins</Text> */}
                             </View>
                             </TouchableOpacity>
                     </View>
@@ -446,8 +443,9 @@ const styles = StyleSheet.create({
         backgroundColor: "#15243b",
         borderWidth: 1,
         margin: 10,
-        padding: 5,
-        borderRadius: 10
+        // padding: 5,
+        borderRadius: 10,
+        height: 60
     },
     statsContainer:{
         flex: 1,

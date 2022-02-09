@@ -209,7 +209,7 @@ function AddPractice() {
                                      onPress={() => deleteVideoUri()}
                                      style={styles.deleteRecordedVideoButton}
                                 >
-                                    <Text style={{fontSize: 25, color: "red"}}>X</Text>
+                                    <Text style={{fontSize: 25, color: "#1F3659", fontWeight:"bold"}}>X</Text>
                                 </Pressable>
                                 <Video
                                     ref={video}
