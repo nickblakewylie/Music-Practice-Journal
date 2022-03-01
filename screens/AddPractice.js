@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect, useContext } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, Animated, Modal, Alert, Pressable, TextInput, Button, Dimensions, Keyboard, TouchableWithoutFeedback, Easing, TouchableHighlight} from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Animated, Modal, Alert, Pressable, TextInput, Button, Dimensions, Keyboard, TouchableWithoutFeedback, Easing, TouchableHighlight, Vibration} from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
 import { Camera } from 'expo-camera';
 import { Video, AVPlaybackStatus } from 'expo-av';
@@ -8,7 +8,11 @@ import uuid from 'react-native-uuid';
 import { RECORDING_OPTION_IOS_OUTPUT_FORMAT_ILBC } from 'expo-av/build/Audio';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {PracticeSessions} from '../PracticeSessions';
+import useTheme from '../myThemes/useTheme';
+import useThemedStyles from '../myThemes/useThemedStyles';
 function AddPractice() {
+    const theme = useTheme();
+    const style = useThemedStyles(styles);
     function clicked(){
         console.log("clicked")
     }
@@ -37,6 +41,7 @@ function AddPractice() {
     const [downloadedVid, setDownloadedVid] = useState(null)
 
     const {practiceSessions, setPracticeSessions} = useContext(PracticeSessions)
+
 
     async function askForCameraPermission(){
         const { status } = await Camera.requestCameraPermissionsAsync();
@@ -125,8 +130,6 @@ function AddPractice() {
         setPracticeSessions(getPracticeSession)
     }
     const startRecord = async () => {
-        console.log("clicked")
-        console.log(recording);
         if(camera){
             if(!recording){
                 setRecording(true)
@@ -146,7 +149,7 @@ function AddPractice() {
         }
     }
     return (
-        <View style={styles.container}>
+        <View style={style.container}>
             {/* <Animated.View 
             style={{width: wavesAnim, borderRadius:10000,height: wavesAnim, backgroundColor: "white", opacity:1, position: "absolute", zIndex: 0}} >
             </Animated.View> */}
@@ -160,15 +163,15 @@ function AddPractice() {
             }}
             >
                 <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss()}}>
-                <View style={styles.practiceContainer}>
+                <View style={style.practiceContainer}>
                         <View>
                             <View style={{margin: 5, marginBottom:15}}>
-                                <Text style={styles.practiceSessionTitle}>Practice Session</Text>
+                                <Text style={style.practiceSessionTitle}>Practice Session</Text>
                             </View>
                             <View>
-                                <Text style={styles.inputHeader}>Time (mins)</Text>
+                                <Text style={style.inputHeader}>Time (mins)</Text>
                                 <TextInput 
-                                    style={styles.practiceInfoText}
+                                    style={style.practiceInfoText}
                                     onChangeText={setPracticeTime}
                                     value={practiceTime ? practiceTime.toString() : practiceTime}
                                     placeholder="Enter Time of Session"
@@ -178,9 +181,9 @@ function AddPractice() {
                                  />
                             </View>
                             <View >
-                                <Text style={styles.inputHeader}>Quality of Session</Text>
+                                <Text style={style.inputHeader}>Quality of Session</Text>
                                 <TextInput 
-                                        style={styles.practiceInfoText}
+                                        style={style.practiceInfoText}
                                         onChangeText={setQuality}
                                         value={quality ? quality.toString() : quality}
                                         placeholder="Enter a Number 1 - 10"
@@ -189,9 +192,9 @@ function AddPractice() {
                                     />
                             </View>
                             <View>
-                                <Text style={styles.inputHeader} >Notes For Session</Text>
+                                <Text style={style.inputHeader} >Notes For Session</Text>
                                 <TextInput 
-                                    style={styles.notesInfo}
+                                    style={style.notesInfo}
                                     placeholder="Enter Notes (optional)"
                                     value={notes}
                                     onChangeText={setNotes}
@@ -201,19 +204,19 @@ function AddPractice() {
                                 />
                             </View>
                                 <View>
-                                    <Text style={styles.inputHeader}>Record Video</Text>
+                                    <Text style={style.inputHeader}>Record Video</Text>
                                 
                             { videoUri ?
-                            <View style={styles.myVideoContainer}>
+                            <View style={style.myVideoContainer}>
                                 <Pressable
                                      onPress={() => deleteVideoUri()}
-                                     style={styles.deleteRecordedVideoButton}
+                                     style={style.deleteRecordedVideoButton}
                                 >
-                                    <Text style={{fontSize: 25, color: "#1F3659", fontWeight:"bold"}}>X</Text>
+                                    <Text style={{fontSize: 25, color: theme.colors.BACKGROUND, fontWeight:"bold"}}>X</Text>
                                 </Pressable>
                                 <Video
                                     ref={video}
-                                    style={styles.video}
+                                    style={style.video}
                                     source={{uri: videoUri}}
                                     useNativeControls
                                     resizeMode="cover"
@@ -232,14 +235,14 @@ function AddPractice() {
                                         setCameraVisible(true);
                                     }}
                                     >
-                                        <View style={styles.myVideoContainer}>
-                                            <Ionicons name="camera"  size={40} color="black" style={{textAlign: "center"}}/>
-                                            <Text style={{textAlign:"center"}}>Take Video (optional) </Text>
+                                        <View style={style.myVideoContainer}>
+                                            <Ionicons name="camera"  size={40} color={theme.colors.TEXT_SECONDARY} style={{textAlign: "center"}}/>
+                                            <Text style={{textAlign:"center", color: theme.colors.TEXT_SECONDARY}}>Take Video (optional) </Text>
                                         </View>
                                     </TouchableOpacity>
                             }
                             </View>
-                            <View style={styles.exitSaveButtonsContainer}>
+                            <View style={style.exitSaveButtonsContainer}>
                                 <Pressable
                                 onPress={() => {
                                     setModalVisible(!modalVisible)
@@ -249,17 +252,17 @@ function AddPractice() {
                                     setNotes(null);
                                     setQuality(null);
                                 }}
-                                style={styles.exitSaveButtons}
+                                style={style.exitSaveButtons}
                                 >
-                                    <Text style={styles.exitButtonsStyle}>Exit</Text>
+                                    <Text style={style.exitButtonsStyle}>Cancel</Text>
                                 </Pressable>
-                                <View style={[styles.exitSaveButtons, styles.rightSide]}>
+                                <View style={[style.exitSaveButtons, style.rightSide]}>
                                     <TouchableOpacity
                                         onPress={downloadFile}
                                         >
                                         { downloading?
-                                            <Text style={styles.exitButtonsStyle}>Downloading</Text>
-                                            : <Text style={styles.exitButtonsStyle}>Save</Text>
+                                            <Text style={style.exitButtonsStyle}>Downloading</Text>
+                                            : <Text style={style.exitButtonsStyle}>Save</Text>
                                         }
                                     </TouchableOpacity>
                                 </View>
@@ -276,12 +279,12 @@ function AddPractice() {
                         >
                             { hasPermission?
                             <View style={{flex: 1}}>
-                                <Camera style={styles.camera} type={type}
+                                <Camera style={style.camera} type={type}
                                     ref={ref => setCamera(ref)}
                                 >
-                                    <View style={styles.buttonContainer}>
+                                    <View style={style.buttonContainer}>
                                         <TouchableOpacity
-                                            style={styles.button}
+                                            style={style.button}
                                             onPress={() => {
                                             setType(
                                                 type === Camera.Constants.Type.back
@@ -289,28 +292,28 @@ function AddPractice() {
                                                 : Camera.Constants.Type.back
                                             );
                                             }}>
-                                            <Text style={{fontSize: 20,  color: "white"}}> Flip </Text>
+                                            <Text style={{fontSize: 20,  color: theme.colors.TEXT}}> Flip </Text>
                                         </TouchableOpacity>
                                         <TouchableOpacity
-                                        style={styles.button}
+                                        style={style.button}
                                         onPress={startRecord}
                                         >
-                                        <Ionicons name="stop-circle-outline" size={70} color={recording ? "red" : "white"}/>
+                                        <Ionicons name="stop-circle-outline" size={70} color={recording ? "red" : theme.colors.TEXT}/>
                                         </TouchableOpacity>
                                         <TouchableOpacity
                                         onPress={() => {
                                             setCameraVisible(false)
                                             setModalVisible(true)
                                         }}
-                                        style={styles.button}>
-                                            <Text style={{fontSize: 20, color: "white"}}>Back button</Text>
+                                        style={style.button}>
+                                            <Text style={{fontSize: 20, color: theme.colors.TEXT}}>Back button</Text>
                                         </TouchableOpacity>
                                     </View>
                                 </Camera> 
-                            </View> : <View style={styles.container} >
+                            </View> : <View style={style.container} >
                                 <Text>We need camera permission</Text>
                                 <TouchableOpacity
-                                    style={styles.addButton}
+                                    style={style.addButton}
                                     onPress={() => askForCameraPermission()}
                                 >
                                     <Text>
@@ -323,16 +326,16 @@ function AddPractice() {
                 </View>
                 </TouchableWithoutFeedback>
             </Modal>
-            <TouchableOpacity onPress={() => setModalVisible(true)} >
-            <Ionicons style={styles.addButton} name="add-circle-outline" size={100} color="white" />
+            <TouchableOpacity onPress={() => {setModalVisible(true)}} >
+            <Ionicons style={style.addButton} name="add-circle-outline" size={100} color={theme.colors.TEXT}/>
             </TouchableOpacity>
-            <Text style={styles.addPracticeText} >Add Your Practice Session</Text>
+            <Text style={style.addPracticeText} >Add Your Practice Session</Text>
         </View>
     )
 }
 export default AddPractice
 
-const styles = StyleSheet.create({
+const styles = theme => StyleSheet.create({
     video:{
         width: "100%",
         height: "100%",
@@ -364,12 +367,12 @@ const styles = StyleSheet.create({
         flex : 1
     },
     practiceSessionTitle: {
-        color: "white",
+        color: theme.colors.TEXT,
         fontSize: 35,
         fontWeight: "bold" 
     },
     practiceInfoText: {
-        color: "black",
+        color: theme.colors.TEXT_SECONDARY,
         height: 50,
         borderWidth: 1,
         padding: 10,
@@ -381,7 +384,7 @@ const styles = StyleSheet.create({
         padding:10
     },
     notesInfo: {
-        color: "black",
+        color: theme.colors.TEXT_SECONDARY,
         height: 80,
         borderWidth: 1,
         padding: 10,
@@ -392,7 +395,7 @@ const styles = StyleSheet.create({
         borderRadius: 15
     },
     myVideoContainer: {
-        color: "black",
+        color: theme.colors.TEXT_SECONDARY,
         height: 210,
         borderWidth: 1,
         backgroundColor: "white",
@@ -405,22 +408,7 @@ const styles = StyleSheet.create({
     inputHeader: {
         margin: 5,
         fontSize: 18,
-        color: "white"
-    },
-    addPracticeContainer: {
-        margin: 20,
-        borderRadius: 20,
-        padding: 35,
-        backgroundColor: "black",
-        alignItems: "center",
-        shadowColor: "#000",
-        shadowOffset: {
-          width: 0,
-          height: 2
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5
+        color: theme.colors.TEXT,
     },
     addButton: {
         shadowColor: "gray",
@@ -434,26 +422,26 @@ const styles = StyleSheet.create({
        
     },
     addPracticeText: {
-        color: "#DFDFDF",
+        color: theme.colors.TEXT,
         fontSize: 25,
         fontWeight: "900"
     },
     container: {
       flex: 1,
-      backgroundColor: "#1F3659",
+      backgroundColor: theme.colors.BACKGROUND,
       alignItems: 'center',
       justifyContent: 'center',
       color: "#CF5C36"
     },
     practiceContainer : {
         flex: 1,
-        backgroundColor: "#1F3659",
+        backgroundColor: theme.colors.BACKGROUND,
         alignItems: 'center',
         color: "#CF5C36",
         paddingTop: 60
     },
     absoluteFill : {
-      backgroundColor: "#E8DCB8",
+      backgroundColor: theme.colors.ACCENT,
       width : "100%",
       height: 100
     },
@@ -474,11 +462,12 @@ const styles = StyleSheet.create({
     },
     rightSide:{
         right: 0,
-        backgroundColor: "#E8DCB8"
+        backgroundColor: theme.colors.ACCENT,
     },
     exitButtonsStyle: {
         fontSize: 18,
-        textAlign: "center"
+        textAlign: "center",
+        color: theme.colors.TEXT_SECONDARY
     },
     deleteRecordedVideoButton : {
         position: "absolute",

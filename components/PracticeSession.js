@@ -5,7 +5,12 @@ import { Ionicons } from '@expo/vector-icons';
 import {PracticeSessions} from '../PracticeSessions';
 import { Entypo } from '@expo/vector-icons'; 
 import { Camera } from 'expo-camera';
+import useTheme from '../myThemes/useTheme';
+import useThemedStyles from '../myThemes/useThemedStyles';
+
 const PracticeSession = ({navigation, route}) =>{
+    const theme = useTheme();
+    const style = useThemedStyles(styles);
     const data = route.params.data
     function makeDateLookNice(date){
         var myDate = new Date(date)
@@ -44,7 +49,7 @@ const PracticeSession = ({navigation, route}) =>{
           // cancel action
         } else if (buttonIndex === 2) {
           deleteDateFromPracticeSessions()
-          navigation.navigate('Main')
+          navigation.navigate('Home')
         } else if (buttonIndex === 1) {
           setMakeEditable(true)
         }
@@ -113,27 +118,27 @@ const PracticeSession = ({navigation, route}) =>{
     }
     return (
         <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss()}}>
-            <View style={styles.practiceContainer}>
+            <View style={style.practiceContainer}>
                 <View style={{width:"100%", flexDirection: "row", paddingLeft:15, paddingRight:15 }} >
                     <View style={{alignItems:"flex-start", width:"50%"}}>
-                        <TouchableOpacity onPress={() => {navigation.navigate('Main')}}>
-                            <Ionicons name="arrow-back" size={30} color="#E8DCB8" style={{alignContent:"flex-start"}}/>
+                        <TouchableOpacity onPress={() => {navigation.navigate('Home')}}>
+                            <Ionicons name="arrow-back" size={30} color={theme.colors.ACCENT} style={{alignContent:"flex-start"}}/>
                         </TouchableOpacity>
                     </View>
                     <View style={{alignItems: "flex-end", width: "50%"}}>
                         <TouchableOpacity onPress={() => {editOrDelete()}}>
-                            <Entypo name="dots-three-vertical" size={30} color="#E8DCB8" style={{alignSelf: "flex-end"}}/>
+                            <Entypo name="dots-three-vertical" size={30} color={theme.colors.ACCENT} style={{alignSelf: "flex-end"}}/>
                         </TouchableOpacity>
                     </View>
                 </View>
                 <View>
                     <View style={{margin: 5, marginBottom:15, marginTop:10}}>
-                        <Text style={styles.practiceSessionTitle}>Practice Session </Text>
+                        <Text style={style.practiceSessionTitle}>Practice Session </Text>
                     </View>
                     <View>
-                        <Text style={styles.inputHeader}>Time (mins)</Text>
+                        <Text style={style.inputHeader}>Time (mins)</Text>
                         <TextInput 
-                            style={[styles.practiceInfoText, makeEditable?{backgroundColor: "white"}: {backgroundColor:"#e3e3e3"}]}
+                            style={[style.practiceInfoText, makeEditable?{backgroundColor: "white"}: {backgroundColor:"#e3e3e3"}]}
                             onChangeText={setPracticeTime}
                             value={practiceTime ? practiceTime.toString() : practiceTime}
                             placeholder="Enter Time of Session"
@@ -144,9 +149,9 @@ const PracticeSession = ({navigation, route}) =>{
                         />
                     </View>
                     <View >
-                        <Text style={styles.inputHeader}>Quality of Session</Text>
+                        <Text style={style.inputHeader}>Quality of Session</Text>
                         <TextInput 
-                                style={[styles.practiceInfoText, makeEditable?{backgroundColor: "white"}: {backgroundColor:"#e3e3e3"}]}
+                                style={[style.practiceInfoText, makeEditable?{backgroundColor: "white"}: {backgroundColor:"#e3e3e3"}]}
                                 onChangeText={setQuality}
                                 value={quality ? quality.toString() : quality}
                                 placeholder="Enter a Number 1 - 10"
@@ -155,12 +160,12 @@ const PracticeSession = ({navigation, route}) =>{
                                 keyboardType="number-pad"
                                 editable={makeEditable}
                             />
-                        {/* <Text style={styles.practiceInfoText}>{data.quality}</Text> */}
+                        {/* <Text style={style.practiceInfoText}>{data.quality}</Text> */}
                     </View>
                     <View>
-                        <Text style={styles.inputHeader} >Notes For Session</Text>
+                        <Text style={style.inputHeader} >Notes For Session</Text>
                         <TextInput 
-                            style={[styles.notesInfo, makeEditable?{backgroundColor: "white"}: {backgroundColor:"#e3e3e3"}]}
+                            style={[style.notesInfo, makeEditable?{backgroundColor: "white"}: {backgroundColor:"#e3e3e3"}]}
                             placeholder="Enter Notes (optional)"
                             value={notes}
                             onChangeText={setNotes}
@@ -172,19 +177,19 @@ const PracticeSession = ({navigation, route}) =>{
                     </View>
                         { videoUri ?
                             <View>
-                                <Text style={styles.inputHeader}>Record Video</Text>
-                                <View style={styles.myVideoContainer}>
+                                <Text style={style.inputHeader}>Record Video</Text>
+                                <View style={style.myVideoContainer}>
                                     { makeEditable ?
                                     <Pressable
                                         onPress={() => deleteVideoUri()}
-                                        style={styles.deleteRecordedVideoButton}
+                                        style={style.deleteRecordedVideoButton}
                                     >
-                                        <Text style={{fontSize: 25, color: "#1F3659", fontWeight:"bold"}}>X</Text>
+                                        <Text style={{fontSize: 25, color: theme.colors.BACKGROUND, fontWeight:"bold"}}>X</Text>
                                     </Pressable> : <View></View>
                                     }
                                     <Video
                                         ref={video}
-                                        style={styles.video}
+                                        style={style.video}
                                         source={{uri: videoUri}}
                                         useNativeControls
                                         resizeMode="cover"
@@ -197,7 +202,7 @@ const PracticeSession = ({navigation, route}) =>{
                                     {makeEditable ?
                                     
                                     <View>
-                                        <Text style={styles.inputHeader}>Record Video</Text>
+                                        <Text style={style.inputHeader}>Record Video</Text>
                                         <TouchableOpacity
                                             style={{alignSelf:"center"}}
                                             onPress={() => {
@@ -209,16 +214,16 @@ const PracticeSession = ({navigation, route}) =>{
                                                 setCameraVisible(true);
                                             }}
                                         >
-                                            <View style={styles.myVideoContainer}>
-                                                <Ionicons name="camera"  size={40} color="black" style={{textAlign: "center"}}/>
-                                                <Text style={{textAlign:"center"}}>Take Video (optional) </Text>
+                                            <View style={style.myVideoContainer}>
+                                                <Ionicons name="camera"  size={40} color={theme.colors.TEXT_SECONDARY} style={{textAlign: "center"}}/>
+                                                <Text style={{textAlign:"center", color: theme.colors.TEXT_SECONDARY}}>Take Video (optional) </Text>
                                             </View>
                                         </TouchableOpacity>
                                     </View> : <View></View>}
                                 </View>
                                 }
                             { makeEditable?
-                            <View style={styles.exitSaveButtonsContainer}>
+                            <View style={style.exitSaveButtonsContainer}>
                                 <TouchableOpacity
                                 onPress={() => {
                                     updatePracticeSession()
@@ -229,9 +234,9 @@ const PracticeSession = ({navigation, route}) =>{
                                     // setNotes(null);
                                     // setQuality(null);
                                 }}
-                                style={styles.exitSaveButtons}
+                                style={style.exitSaveButtons}
                                 >
-                                    <Text style={styles.exitButtonsStyle}>Save your Changes</Text>
+                                    <Text style={style.exitButtonsStyle}>Save your Changes</Text>
                                 </TouchableOpacity> 
                                 </View>: <View></View>
                             }
@@ -246,12 +251,12 @@ const PracticeSession = ({navigation, route}) =>{
                         >
                             { hasPermission?
                             <View style={{flex: 1}}>
-                                <Camera style={styles.camera} type={type}
+                                <Camera style={style.camera} type={type}
                                     ref={ref => setCamera(ref)}
                                 >
-                                    <View style={styles.buttonContainer}>
+                                    <View style={style.buttonContainer}>
                                         <TouchableOpacity
-                                            style={styles.button}
+                                            style={style.button}
                                             onPress={() => {
                                             setType(
                                                 type === Camera.Constants.Type.back
@@ -259,28 +264,28 @@ const PracticeSession = ({navigation, route}) =>{
                                                 : Camera.Constants.Type.back
                                             );
                                             }}>
-                                            <Text style={{fontSize: 20,  color: "white"}}> Flip </Text>
+                                            <Text style={{fontSize: 20,  color: theme.colors.TEXT}}> Flip </Text>
                                         </TouchableOpacity>
                                         <TouchableOpacity
-                                        style={styles.button}
+                                        style={style.button}
                                         onPress={startRecord}
                                         >
-                                        <Ionicons name="stop-circle-outline" size={70} color={recording ? "red" : "white"}/>
+                                        <Ionicons name="stop-circle-outline" size={70} color={recording ? "red" : theme.colors.TEXT}/>
                                         </TouchableOpacity>
                                         <TouchableOpacity
                                         onPress={() => {
                                             setCameraVisible(false)
                                             setModalVisible(true)
                                         }}
-                                        style={styles.button}>
-                                            <Text style={{fontSize: 20, color: "white"}}>Back button</Text>
+                                        style={style.button}>
+                                            <Text style={{fontSize: 20, color: theme.colors.TEXT}}>Back button</Text>
                                         </TouchableOpacity>
                                     </View>
                                 </Camera> 
-                            </View> : <View style={styles.container} >
+                            </View> : <View style={style.container} >
                                 <Text>We need camera permission</Text>
                                 <TouchableOpacity
-                                    style={styles.addButton}
+                                    style={style.addButton}
                                     onPress={() => askForCameraPermission()}
                                 >
                                     <Text>
@@ -298,7 +303,7 @@ const PracticeSession = ({navigation, route}) =>{
 }
 export default PracticeSession
 
-const styles = StyleSheet.create({
+const styles = theme => StyleSheet.create({
     video: {
         width: Dimensions.get('window').width,
         height: 400
@@ -310,21 +315,13 @@ const styles = StyleSheet.create({
         backgroundColor: "white",
         borderWidth: 2,
     },
-    sessions : {
-        backgroundColor: "#5F7CA6",
-    },
-    timeText: {
-        color:"#1F3659",
-        fontSize: 30,
-
-    },
     practiceSessionTitle: {
-        color: "white",
+        color: theme.colors.TEXT,
         fontSize: 35,
         fontWeight: "bold" 
     },
     practiceInfoText: {
-        color: "black",
+        color: theme.colors.TEXT_SECONDARY,
         height: 50,
         borderWidth: 1,
         padding: 10,
@@ -336,7 +333,7 @@ const styles = StyleSheet.create({
         padding:10
     },
     notesInfo: {
-        color: "black",
+        color: theme.colors.TEXT_SECONDARY,
         height: 80,
         borderWidth: 1,
         // padding: 10,
@@ -348,7 +345,7 @@ const styles = StyleSheet.create({
     },
     practiceContainer : {
         flex: 1,
-        backgroundColor: "#1F3659",
+        backgroundColor: theme.colors.BACKGROUND,
         alignItems: 'center',
         color: "#CF5C36",
         paddingTop: 60
@@ -356,7 +353,7 @@ const styles = StyleSheet.create({
     inputHeader: {
         margin: 5,
         fontSize: 18,
-        color: "white"
+        color: theme.colors.TEXT
     },
     video:{
         width: "100%",
@@ -365,7 +362,7 @@ const styles = StyleSheet.create({
         borderRadius:15
     },
     myVideoContainer: {
-        color: "black",
+        color: theme.colors.TEXT_SECONDARY,
         height: 210,
         borderWidth: 1,
         backgroundColor: "white",
@@ -394,7 +391,7 @@ const styles = StyleSheet.create({
         // padding:10
     },
     exitSaveButtons: {
-        backgroundColor: "#E8DCB8",
+        backgroundColor: theme.colors.ACCENT,
         position: "absolute",
         justifyContent:"center",
         alignSelf:"center",

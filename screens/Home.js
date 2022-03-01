@@ -8,16 +8,19 @@ import { Ionicons } from '@expo/vector-icons';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import PracticeSession from '../components/PracticeSession';
-import { VictoryLine, VictoryChart, VictoryTheme, VictoryLabel, VictoryBar, VictoryAxis, VictoryGroup, VictoryArea, VictoryScatter } from 'victory-native';
+import { VictoryLine, VictoryChart, VictoryTheme, VictoryLabel, VictoryBar, VictoryAxis, VictoryGroup, VictoryArea, VictoryScatter, VictoryTooltip } from 'victory-native';
 import Header from '../components/Header';
-
+import useTheme from '../myThemes/useTheme';
+import useThemedStyles from '../myThemes/useThemedStyles';
 const Stack = createNativeStackNavigator();
 const Home = () => {
+    const theme = useTheme();
+    const style = useThemedStyles(styles);
     return (
         <Stack.Navigator
             screenOptions={{
                 headerBackVisible: false,
-                headerStyle:{backgroundColor: "#E8DCB8"}
+                headerStyle:{backgroundColor: theme.colors.ACCENT}
             }}
             >
             <Stack.Screen
@@ -26,26 +29,12 @@ const Home = () => {
             options={{headerShown: false }}
             >
             </Stack.Screen>
-            {/* <Stack.Screen
-                name="EditPracticePage"
-                component={PracticeSession}
-                options={({navigation}) => ({
-                    headerTitle: () => <Header name="Edit Practice Session"/> ,
-                    headerLeft : () => (
-                        <TouchableOpacity
-                            onPress={() => navigation.navigate('Main')}
-                            style={{position: "absolute", left: 0}}
-                        >
-                            <Ionicons name="arrow-back" size={24} color="black" />
-                        </TouchableOpacity>
-                    ),
-                })}
-            >
-            </Stack.Screen> */}
         </Stack.Navigator>
     )
 }
 const MainPage = ({navigation, route})  => {
+    const theme = useTheme();
+    const style = useThemedStyles(styles);
     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September','October', 'November', 'December']
     const shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec']
     const weekday = ["Sun","Mon","Tue","Wed","Thur","Fri","Sat"];
@@ -78,26 +67,7 @@ const MainPage = ({navigation, route})  => {
         return date;
     }
     function getDayNumbersPastWeek(){
-        var date = new Date()
-        // if(d > 7){
-        //     return [d, d-1, d-2, d - 3, d -4, d-5, d-6]
-        // }else{
-        //     const pastMonth = months.indexOf(currentMonth) - 1
-        //     if (pastMonth  == 11){
-        //         pastMonth = 0
-        //     }
-        //     const daysInPastMonth = getDaysInMonth(pastMonth, new Date().getFullYear())
-        //     const difference = d - 6;
-        //     var newArray = []
-        //     for(var i = daysInPastMonth + difference; i <= daysInPastMonth ; i++){
-        //         newArray.push({day : i, month : pastMonth})
-        //     }
-        //     for(var j = 1; j <= d;j ++){
-        //         newArray.push({day:j, month: pastMonth + 1})
-        //     }
-        //     return newArray
-        // }
-        // var result = new Da
+        var date = new Date();
         return [date.subtractDays(6),date.subtractDays(5),date.subtractDays(4),date.subtractDays(3),date.subtractDays(2),date.subtractDays(1), date]
     }
     function checkIfDateInWeekArray(currentDay, weekDays){
@@ -263,18 +233,18 @@ const MainPage = ({navigation, route})  => {
         if(practiceSessions != null && thisMonthsSessions != null){
             // week selected
             if(weekMonthYear == 0){
-                tempData.push({x : weekday[theCurrentDate.subtractDays(6).getDay()], y: findPracticeSessionForDay(theCurrentDate.subtractDays(6).getDate(),theCurrentDate.subtractDays(6).getMonth(), theCurrentDate.subtractDays(6).getFullYear())})
-                tempData.push({x : weekday[theCurrentDate.subtractDays(5).getDay()],y: findPracticeSessionForDay(theCurrentDate.subtractDays(5).getDate(),theCurrentDate.subtractDays(5).getMonth(), theCurrentDate.subtractDays(5).getFullYear())})
-                tempData.push({x : weekday[theCurrentDate.subtractDays(4).getDay()],y: findPracticeSessionForDay(theCurrentDate.subtractDays(4).getDate(),theCurrentDate.subtractDays(4).getMonth(), theCurrentDate.subtractDays(4).getFullYear()) })
-                tempData.push({x : weekday[theCurrentDate.subtractDays(3).getDay()], y: findPracticeSessionForDay(theCurrentDate.subtractDays(3).getDate(),theCurrentDate.subtractDays(3).getMonth(), theCurrentDate.subtractDays(3).getFullYear())})
-                tempData.push({x : weekday[theCurrentDate.subtractDays(2).getDay()], y: findPracticeSessionForDay(theCurrentDate.subtractDays(2).getDate(),theCurrentDate.subtractDays(2).getMonth(), theCurrentDate.subtractDays(2).getFullYear())})
-                tempData.push({x : weekday[theCurrentDate.subtractDays(1).getDay()], y: findPracticeSessionForDay(theCurrentDate.subtractDays(1).getDate(),theCurrentDate.subtractDays(1).getMonth(), theCurrentDate.subtractDays(1).getFullYear())})
-                tempData.push({x : weekday[theCurrentDate.getDay()],y: findPracticeSessionForDay(theCurrentDate.getDate(),theCurrentDate.getMonth(), theCurrentDate.getFullYear())})
+                tempData.push({x : weekday[theCurrentDate.subtractDays(6).getDay()], y: findPracticeSessionForDay(theCurrentDate.subtractDays(6).getDate(),theCurrentDate.subtractDays(6).getMonth(), theCurrentDate.subtractDays(6).getFullYear()), label: findPracticeSessionForDay(theCurrentDate.subtractDays(6).getDate(),theCurrentDate.subtractDays(6).getMonth(), theCurrentDate.subtractDays(6).getFullYear()).toString()})
+                tempData.push({x : weekday[theCurrentDate.subtractDays(5).getDay()],y: findPracticeSessionForDay(theCurrentDate.subtractDays(5).getDate(),theCurrentDate.subtractDays(5).getMonth(), theCurrentDate.subtractDays(5).getFullYear()), label:findPracticeSessionForDay(theCurrentDate.subtractDays(5).getDate(),theCurrentDate.subtractDays(5).getMonth(), theCurrentDate.subtractDays(5).getFullYear()).toString() })
+                tempData.push({x : weekday[theCurrentDate.subtractDays(4).getDay()],y: findPracticeSessionForDay(theCurrentDate.subtractDays(4).getDate(),theCurrentDate.subtractDays(4).getMonth(), theCurrentDate.subtractDays(4).getFullYear()), label:findPracticeSessionForDay(theCurrentDate.subtractDays(4).getDate(),theCurrentDate.subtractDays(4).getMonth(), theCurrentDate.subtractDays(4).getFullYear()).toString() })
+                tempData.push({x : weekday[theCurrentDate.subtractDays(3).getDay()], y: findPracticeSessionForDay(theCurrentDate.subtractDays(3).getDate(),theCurrentDate.subtractDays(3).getMonth(), theCurrentDate.subtractDays(3).getFullYear()), label: findPracticeSessionForDay(theCurrentDate.subtractDays(3).getDate(),theCurrentDate.subtractDays(3).getMonth(), theCurrentDate.subtractDays(3).getFullYear()).toString()})
+                tempData.push({x : weekday[theCurrentDate.subtractDays(2).getDay()], y: findPracticeSessionForDay(theCurrentDate.subtractDays(2).getDate(),theCurrentDate.subtractDays(2).getMonth(), theCurrentDate.subtractDays(2).getFullYear()), label: findPracticeSessionForDay(theCurrentDate.subtractDays(2).getDate(),theCurrentDate.subtractDays(2).getMonth(), theCurrentDate.subtractDays(2).getFullYear()).toString()})
+                tempData.push({x : weekday[theCurrentDate.subtractDays(1).getDay()], y: findPracticeSessionForDay(theCurrentDate.subtractDays(1).getDate(),theCurrentDate.subtractDays(1).getMonth(), theCurrentDate.subtractDays(1).getFullYear()), label: findPracticeSessionForDay(theCurrentDate.subtractDays(1).getDate(),theCurrentDate.subtractDays(1).getMonth(), theCurrentDate.subtractDays(1).getFullYear()).toString()})
+                tempData.push({x : weekday[theCurrentDate.getDay()],y: findPracticeSessionForDay(theCurrentDate.getDate(),theCurrentDate.getMonth(), theCurrentDate.getFullYear()), label : findPracticeSessionForDay(theCurrentDate.getDate(),theCurrentDate.getMonth(), theCurrentDate.getFullYear()).toString()})
             }else if(weekMonthYear == 1){
                 for(var i = 1; i < daysInMonth; i++){
                     const y = findPracticeSessionForDay(i,months.indexOf(currentMonth), year)
                     // console.log(y)
-                    tempData.push({x: i , y : y})
+                    tempData.push({x: i , y : y, label: y.toString()})
                 }
             //     // year
             }else if(weekMonthYear == 2){
@@ -287,7 +257,7 @@ const MainPage = ({navigation, route})  => {
                     var dateString = year.toString() + "-" + newMonthS + "-01"
                     const dateS = new Date(year.toString() + "-" + newMonthS + "-01")
                     // console.log(dateS)
-                    tempData.push({x : shortMonths[monthCount], y: Math.round((findPracticeTimeForMonth(monthCount, year) / 60 + Number.EPSILON) * 100) / 100})
+                    tempData.push({x : shortMonths[monthCount], y: Math.round((findPracticeTimeForMonth(monthCount, year) / 60 + Number.EPSILON) * 100) / 100, label: (Math.round((findPracticeTimeForMonth(monthCount, year) / 60 + Number.EPSILON) * 100) / 100).toString()})
                 }
             }
             setChartData(tempData)
@@ -297,16 +267,16 @@ const MainPage = ({navigation, route})  => {
         axis: {
             style: {
                 tickLabels: {
-                    fill: "white",
-                    padding: 10,
+                    fill: theme.colors.TEXT,
+                    padding: 12,
                 },
                 axisLabel: {
-                    fill: "white",
+                    fill: theme.colors.TEXT,
                     padding: 36
                 },
                 grid: {
                     stroke: "transparent",
-                    fill:"white"
+                    fill:theme.colors.TEXT
                 },
                 axis : {
                     stroke: "transparent"
@@ -315,58 +285,55 @@ const MainPage = ({navigation, route})  => {
         }
         
     }
-    if(practiceSessions != null){
+    // if(practiceSessions != null){
         return(
-            <ScrollView style={{backgroundColor: "#1F3659", marginBottom: 80}} automaticallyAdjustContentInsets={false}>
+            <ScrollView style={{backgroundColor: theme.colors.BACKGROUND}} contentContainerStyle={{paddingBottom: 80}} automaticallyAdjustContentInsets={false}>
                 <View style={{flex: 1, flexDirection: "row", margin: 5, marginBottom: 0}}>
-                        <View style={[styles.statBubble, weekMonthYear == 0? styles.acticeColor : ""]}>
                             <TouchableOpacity 
                                 onPress={() => {setWeekMonthYear(0)}}
+                                style={[style.statBubble, weekMonthYear == 0? style.acticeColor : ""]}
                             >
-                                <View style={[styles.statBubbleTop]}>
-                                    <Text style={[weekMonthYear == 0 ? {color: "black"} : styles.statTextColor,  styles.statFont]}>Last Week</Text>
+                                <View style={[style.statBubbleTop]}>
+                                    <Text style={[weekMonthYear == 0 ? {color: theme.colors.TEXT_SECONDARY} : style.statTextColor,  style.statFont]}>Last Week</Text>
                                 </View>
                             </TouchableOpacity>
-                        </View>
-                        <View style={[styles.statBubble, weekMonthYear == 1? styles.acticeColor : ""]}>
                             <TouchableOpacity
                                 onPress={() => {setWeekMonthYear(1)}}
+                                style={[style.statBubble, weekMonthYear == 1? style.acticeColor : ""]}
                             >
-                                <Text style={[weekMonthYear == 1? {color: "black"} : styles.statTextColor, styles.statFont, ]}>This Month</Text>
+                                <Text style={[weekMonthYear == 1? {color: theme.colors.TEXT_SECONDARY} : style.statTextColor, style.statFont, ]}>This Month</Text>
                             </TouchableOpacity>
-                        </View>
-                        <View style={[styles.statBubble, weekMonthYear == 2? styles.acticeColor : ""]}>
                             <TouchableOpacity
                             onPress={() => {setWeekMonthYear(2)}}
+                            style={[style.statBubble, weekMonthYear == 2? style.acticeColor : ""]}
                             >
-                                <Text style={[weekMonthYear == 2? {color: "black"} : styles.statTextColor, styles.statFont]}>This Year</Text>
+                                <Text style={[weekMonthYear == 2? {color: theme.colors.TEXT_SECONDARY} : style.statTextColor, style.statFont]}>This Year</Text>
                             </TouchableOpacity>
-                        </View>
                 </View>
                 <View style={{flex: 1, flexDirection: "row", margin: 5, marginTop: 0}}>
-                    <View style={styles.statBubble}>
-                            <View style={styles.statBubbleTop}>
-                                <Ionicons name="time" size={30} color="white"  /><Text style={[styles.statBubbleHeader, styles.statTextColor]}>Time Practiced</Text>
+                    <View style={style.statBubble}>
+                            <View style={style.statBubbleTop}>
+                                <Ionicons name="time" size={30} color="white"  /><Text style={[style.statBubbleHeader, style.statTextColor]}>Time Practiced</Text>
                             </View>
                             <View>
-                                <Text style={[{fontSize: 18, marginLeft:5}, styles.statTextColor]}>{Math.round((timePracticed + Number.EPSILON) * 100) / 100} hrs</Text>
+                                <Text style={[{fontSize: 18, marginLeft:5}, style.statTextColor]}>{Math.round((timePracticed + Number.EPSILON) * 100) / 100} hrs</Text>
                             </View>
                     </View>
-                    <View style={styles.statBubble}>
-                        <View style={styles.statBubbleTop}>
-                            <Ionicons name="checkmark" size={30} color="green" /><Text style={[styles.statBubbleHeader, styles.statTextColor]}>Average Quality</Text>
+                    <View style={style.statBubble}>
+                        <View style={style.statBubbleTop}>
+                            <Ionicons name="checkmark" size={30} color="green" /><Text style={[style.statBubbleHeader, style.statTextColor]}>Average Quality</Text>
                         </View>
                         <View>
-                            <Text style={[{fontSize: 20, marginLeft: 5}, styles.statTextColor]} >{Math.round((averageQuality + Number.EPSILON) * 100) / 100}</Text>
+                            <Text style={[{fontSize: 20, marginLeft: 5}, style.statTextColor]} >{Math.round((averageQuality + Number.EPSILON) * 100) / 100}</Text>
                         </View>
                     </View>
                 </View>
-                <View style={styles.myChart}>
+                <View style={style.myChart}>
                     {
                         chartData !=null && chartData.length > 0  && thisMonthsSessions != null? 
                     
                     <View>
-                        <Text style={[styles.chartTitle,styles.statTextColor]} >My Practice Sessions</Text>
+                        <Text style={[style.chartTitle,style.statTextColor]} >My Practice Sessions</Text>
                         <VictoryChart
                         width={400}
                         height={230}
@@ -379,21 +346,28 @@ const MainPage = ({navigation, route})  => {
                         }
                         <VictoryBar
                             data={chartData}
-                            style={{data: {stroke: "gray",fill: "#5F7CA6", width: 10}}}
+                            style={{data: {stroke: theme.colors.TEXT,fill: "#5F7CA6", width: 14}}}
                             // labels={datum => datum.toString()}
-                            // labelComponent={<VictoryLabel y={250} verticalAnchor={"start"} />}
+                            labelComponent={<VictoryTooltip renderInPortal={false} style={{fontSize: 16, padding: 3}}/>}
+                            // style={{
+                            //     data: {fill: "tomato", width: 20}
+                            //   }}
                         />
                         </VictoryChart>
                     </View>: 
                     <View>
-
+                        <Text style={[style.statText, style.practiceSessionHeaderText, {textAlign: "center"}]}>No Data</Text>
                     </View>
 
                     }
                 </View>
-                <View style={styles.practiceSessionHeader}> 
-                    <Text style={[styles.statText, styles.practiceSessionHeaderText]}>Practice Session</Text>
+                { thisMonthsSessions != null ?
+                <View style={style.practiceSessionHeader}> 
+                    <Text style={[style.statText, style.practiceSessionHeaderText]}>Practice Session</Text>
+                </View>: <View>
+
                 </View>
+                }
                 {
                     thisMonthsSessions?
                     thisMonthsSessions.map((data, index) => 
@@ -401,12 +375,12 @@ const MainPage = ({navigation, route})  => {
                             <TouchableOpacity
                                     onPress={() => {navigation.navigate(('EditPracticePage'), {data : data})}}
                             >                  
-                            <View style={styles.sessions}>
+                            <View style={style.sessions}>
                                     <View style={{flex: 1, flexDirection: "row", justifyContent:"center"}}>
-                                        <Text style={{fontSize: 22, color: 'white', flex: 0.8, alignSelf:"center", paddingLeft:10}}>{makeDateLookNice(data.date)}</Text>
+                                        <Text style={{fontSize: 22, color: theme.colors.TEXT, flex: 0.8, alignSelf:"center", paddingLeft:10}}>{makeDateLookNice(data.date)}</Text>
                                         <View style={{alignItems: "center", flex: 0.2, backgroundColor:"white",alignContent:"center",justifyContent:"center", borderTopRightRadius:9,borderBottomRightRadius:9,borderWidth:1}}>
-                                            <Text style={{color: "black", fontSize: 22, textAlign:"center",fontWeight:"600"}}>{data.practiceTime}</Text>
-                                            <Text style={{color: "black", fontSize: 22, textAlign:"center", fontWeight:"600"}}> mins</Text>
+                                            <Text style={{color: theme.colors.TEXT_SECONDARY, fontSize: 22, textAlign:"center",fontWeight:"600"}}>{data.practiceTime}</Text>
+                                            <Text style={{color: theme.colors.TEXT_SECONDARY, fontSize: 22, textAlign:"center", fontWeight:"600"}}> mins</Text>
                                         </View>
                                     </View>
                                     {/* <Text style={{color: "white", fontSize: 15}}>{data.practiceTime} mins</Text> */}
@@ -417,17 +391,12 @@ const MainPage = ({navigation, route})  => {
                 }
             </ScrollView>
         )
-    }
-    return (
-        <View>
-            <Text>Home</Text>
-        </View>
-    )
+    
 }
 
 export default Home
 
-const styles = StyleSheet.create({
+const styles = theme => StyleSheet.create({
     video: {
         width: Dimensions.get('window').width,
         height: 400
@@ -440,7 +409,7 @@ const styles = StyleSheet.create({
         borderWidth: 2,
     },
     sessions : {
-        backgroundColor: "#15243b",
+        backgroundColor: theme.colors.SECONDARY,
         borderWidth: 1,
         margin: 10,
         // padding: 5,
@@ -452,7 +421,7 @@ const styles = StyleSheet.create({
         marginLeft: 15
     },
     statText: {
-        color: "white",
+        color: theme.colors.TEXT,
         fontSize: 20,
     },
     myChart: {
@@ -461,13 +430,13 @@ const styles = StyleSheet.create({
         // margin: 10,
         borderRadius: 15,
         width: 400,
-        height: 280,
+        height: 250,
         justifyContent: "center",
-        backgroundColor: "#15243b",
+        backgroundColor: theme.colors.SECONDARY,
         alignSelf:"center"
     },
     statBubble: {
-        backgroundColor: "#15243b",
+        backgroundColor:theme.colors.SECONDARY,
         flex: 0.5,
         margin: 10,
         padding: 6,
@@ -484,12 +453,12 @@ const styles = StyleSheet.create({
         fontSize: 21,
     },
     statTextColor: {
-        color: "white"
+        color: theme.colors.TEXT
     },
     chartTitle: {
         fontSize: 20,
-        marginTop: 5,
-        marginBottom: 0,
+        marginTop: 0,
+        marginBottom: -25,
         marginLeft: 20
     },
     statFont: {

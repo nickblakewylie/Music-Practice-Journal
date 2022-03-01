@@ -4,7 +4,21 @@
     "slug": "MusicApp",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/guitar.png",
+    "notification" : {
+      "icon" : "./assets/guitar.png"
+    },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "color": "blue",
+          "mode": "production",
+          "icon": "./assets/guitar.png",
+          "sound" : ["./assets/monk.mp3"]
+        }
+      ]
+    ],
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -17,13 +31,15 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.musiclogtracker123.ios"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.nick_wylie.music_tracker"
     },
     "web": {
       "favicon": "./assets/favicon.png"
