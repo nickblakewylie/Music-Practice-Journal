@@ -7,21 +7,21 @@ import { Ionicons} from '@expo/vector-icons';
 function SetListItem({name, difficulty, pTime}) {
     const theme = useTheme();
     const style = useThemedStyles(styles);
-    function deleteThisSong(){
-        console.log("What's up")
-    }
+    // function deleteThisSong(){
+    //     console.log("What's up")
+    // }
     return (
-        <TouchableOpacity style={style.setListContainer} onPress={() => deleteThisSong()}>
+        <View style={style.setListContainer} >
             <View style={{flex: 0.5}}>
                 <Text style={style.setListText}>{name}</Text>
             </View>
-            <View style={[style.editContainer,{backgroundColor: theme.colors.TEXT_SECONDARY, borderTopRightRadius: 0, borderBottomRightRadius:0}]}>
+            <View style={[style.editContainer,{ borderTopRightRadius: 0, borderBottomRightRadius:0}, {backgroundColor: difficulty > 7? "#ff5e5e" : difficulty > 4 ? theme.colors.ACCENT : "black"}]}>
                 <Text style={style.setListText}>{difficulty}</Text>
             </View>
             <View style={style.editContainer}>
                 <Text style={[style.setListText, {color: theme.colors.TEXT_SECONDARY}]}>{pTime} mins</Text>
             </View>
-        </TouchableOpacity>
+        </View>
     )
 }
 

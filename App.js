@@ -19,13 +19,6 @@ import { Foundation } from '@expo/vector-icons';
 import useTheme from './myThemes/useTheme';
 import useThemedStyles from './myThemes/useThemedStyles';
 import SetListScreen from './screens/SetListScreen';
-// function HomeScreen() {
-//   return (
-//     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-//       <Text>Home page</Text>
-//     </View>
-//   );
-// }
 function SetList() {
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -87,8 +80,8 @@ function HomeTabs({route}){
 const RootStack = createNativeStackNavigator();
 export default function App() {
   const [practiceSessions, setPracticeSessions] = React.useState(null);
-  const [setLists, setSetLists] = React.useState(null);
-  const sProviderValue = React.useMemo(() => ({setLists, setSetLists}, [setLists, setSetLists]));
+  const [setLists, setMySetLists] = React.useState(null);
+  const setListValue = React.useMemo(() => ({setLists, setMySetLists}), [setLists, setMySetLists]);
   const providerValue = React.useMemo(() => ({practiceSessions, setPracticeSessions}), [practiceSessions, setPracticeSessions]);
   const getData = async() => {
     console.log("Screen loaded")
@@ -96,7 +89,7 @@ export default function App() {
     getPracticeSession = getPracticeSession != null ? JSON.parse(getPracticeSession) : null
     var getSetLists = await AsyncStorage.getItem('setLists');
     getSetLists = getSetLists != null ? JSON.parse(getSetLists): null
-    setSetLists(getSetLists)
+    setMySetLists(getSetLists)
     setPracticeSessions(getPracticeSession)
     console.log("Get Set Lists ")
     console.log(getSetLists)
@@ -106,8 +99,8 @@ export default function App() {
   }, [])
   return (
     <NavigationContainer>
-      <SetLists.Provider value={sProviderValue} >
       <PracticeSessions.Provider value={providerValue}>
+      <SetLists.Provider value={setListValue} >
         <ThemeProvider>
         <RootStack.Navigator>
           <RootStack.Screen name="HomePage" component={HomeTabs} options={{headerShown: false}}/>
@@ -117,8 +110,8 @@ export default function App() {
                 />
         </RootStack.Navigator>
         </ThemeProvider>
+        </SetLists.Provider>
       </PracticeSessions.Provider>
-      </SetLists.Provider>
     </NavigationContainer>
   );
 }
