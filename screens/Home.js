@@ -12,6 +12,15 @@ import { VictoryLine, VictoryChart, VictoryTheme, VictoryLabel, VictoryBar, Vict
 import Header from '../components/Header';
 import useTheme from '../myThemes/useTheme';
 import useThemedStyles from '../myThemes/useThemedStyles';
+
+// import {
+//     AdMobBanner,
+//     AdMobInterstitial,
+//     PublisherBanner,
+//     AdMobRewarded,
+//     setTestDeviceIDAsync,
+//   } from 'expo-ads-admob';
+
 const Stack = createNativeStackNavigator();
 const Home = () => {
     const theme = useTheme();
@@ -155,13 +164,7 @@ const MainPage = ({navigation, route})  => {
     useEffect(() => {
         updatePracticeSessionStorage()
         getThisMonthsPracticeSessions()
-        console.log("updated")
-    }, [route.params])
-    useEffect(() => {
-        updatePracticeSessionStorage()
-        // getTimePracticed()
-        getThisMonthsPracticeSessions()
-    }, [practiceSessions])
+    }, [JSON.stringify(practiceSessions)])
     useEffect(() => {
         // getTimePracticed()
         getThisMonthsPracticeSessions()
@@ -169,7 +172,6 @@ const MainPage = ({navigation, route})  => {
     useEffect(() => {
         getTimePracticed()
         calculateChartData()
-        console.log("months sessions updated")
     }, [thisMonthsSessions])
     useEffect(() => {
         // getTimePracticed()
@@ -178,6 +180,7 @@ const MainPage = ({navigation, route})  => {
     useEffect(() => {
         // console.log("loaded")
         getThisMonthsPracticeSessions()
+        // setTestDeviceIDAsync('EMULATOR');
     }, [])
     function getDaysInMonth(month, year){
         return new Date(year, month, 0).getDate();
@@ -288,20 +291,27 @@ const MainPage = ({navigation, route})  => {
     // if(practiceSessions != null){
         return(
             <ScrollView style={{backgroundColor: theme.colors.BACKGROUND}} contentContainerStyle={{paddingBottom: 80}} automaticallyAdjustContentInsets={false}>
-                <View style={{flex: 1, flexDirection: "row", margin: 5, marginBottom: 0}}>
+                {/* <View style={{flex: 1, justifyContent:"center", alignItems:"center"}}>
+                    <AdMobBanner
+                    bannerSize="banner"
+                    adUnitID="ca-app-pub-5263616863180217/9832651621"
+                    onDidFailToReceiveAdWithError={(e) => console.log(e)}
+                    servePersonalizedAds={true}
+                    // style={{padding: 20}}
+                    />
+                </View> */}
+                <View style={{width:"90%", flexDirection: "row",alignSelf:"center"}}>
                             <TouchableOpacity 
                                 onPress={() => {setWeekMonthYear(0)}}
-                                style={[style.statBubble, weekMonthYear == 0? style.acticeColor : ""]}
+                                style={[style.statBubble, weekMonthYear == 0? style.acticeColor : "", {marginRight: 5}]}
                             >
-                                <View style={[style.statBubbleTop]}>
                                     <Text style={[weekMonthYear == 0 ? {color: theme.colors.TEXT_SECONDARY} : style.statTextColor,  style.statFont]}>Last Week</Text>
-                                </View>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 onPress={() => {setWeekMonthYear(1)}}
-                                style={[style.statBubble, weekMonthYear == 1? style.acticeColor : ""]}
+                                style={[style.statBubble, weekMonthYear == 1? style.acticeColor : "", {marginRight: 5}]}
                             >
-                                <Text style={[weekMonthYear == 1? {color: theme.colors.TEXT_SECONDARY} : style.statTextColor, style.statFont, ]}>This Month</Text>
+                                <Text style={[weekMonthYear == 1? {color: theme.colors.TEXT_SECONDARY} : style.statTextColor, style.statFont ]}>This Month</Text>
                             </TouchableOpacity>
                             <TouchableOpacity
                             onPress={() => {setWeekMonthYear(2)}}
@@ -310,56 +320,62 @@ const MainPage = ({navigation, route})  => {
                                 <Text style={[weekMonthYear == 2? {color: theme.colors.TEXT_SECONDARY} : style.statTextColor, style.statFont]}>This Year</Text>
                             </TouchableOpacity>
                 </View>
-                <View style={{flex: 1, flexDirection: "row", margin: 5, marginTop: 0}}>
-                    <View style={style.statBubble}>
+                <View style={{width:"90%",alignSelf:"center", flexDirection: "row", marginTop: 0, alignItems:"center", marginBottom: 5}}>
+                    <View style={[style.statBubble, {marginRight: 5}]}>
                             <View style={style.statBubbleTop}>
-                                <Ionicons name="time" size={30} color="white"  /><Text style={[style.statBubbleHeader, style.statTextColor]}>Time Practiced</Text>
+                                <Ionicons name="time" size={theme.typography.size.L} color="white"  /><Text style={[style.statBubbleHeader, style.statTextColor]}>Time Practiced</Text>
                             </View>
                             <View>
-                                <Text style={[{fontSize: 18, marginLeft:5}, style.statTextColor]}>{Math.round((timePracticed + Number.EPSILON) * 100) / 100} hrs</Text>
+                                <Text style={[{fontSize: theme.typography.size.SM, marginLeft:5}, style.statTextColor]}>{Math.round((timePracticed + Number.EPSILON) * 100) / 100} hrs</Text>
                             </View>
                     </View>
-                    <View style={style.statBubble}>
+                    <View style={[style.statBubble,{marginLeft: 5}]}>
                         <View style={style.statBubbleTop}>
-                            <Ionicons name="checkmark" size={30} color="green" /><Text style={[style.statBubbleHeader, style.statTextColor]}>Average Quality</Text>
+                            <Ionicons name="checkmark" size={theme.typography.size.L} color="green" /><Text style={[style.statBubbleHeader, style.statTextColor]}>Average Quality</Text>
                         </View>
                         <View>
-                            <Text style={[{fontSize: 20, marginLeft: 5}, style.statTextColor]} >{Math.round((averageQuality + Number.EPSILON) * 100) / 100}</Text>
+                            <Text style={[{fontSize: theme.typography.size.SM, marginLeft: 5}, style.statTextColor]} >{Math.round((averageQuality + Number.EPSILON) * 100) / 100}</Text>
                         </View>
                     </View>
                 </View>
-                <View style={style.myChart}>
+                <View style={{ width: "90%",backgroundColor: theme.colors.SECONDARY,borderRadius: 10, padding: 10, alignSelf:"center"}}>
+                <View style={{ flexDirection: "row", justifyContent:"center",alignItems:"center",alignSelf:"center"}}>
                     {
                         chartData !=null && chartData.length > 0  && thisMonthsSessions != null? 
                     
-                    <View>
-                        <Text style={[style.chartTitle,style.statTextColor]} >My Practice Sessions</Text>
+                    <View style={{alignItems:"center", width:"100%", flexDirection:"column"}}>
+                        <View style={{width:"100%", alignItems:"center"}}>
+                            <Text style={[style.chartTitle,style.statTextColor, {textAlign:"left"}]} >My Practice Sessions</Text>
+                        </View>
+                        <View style={{alignSelf:"center", width: "100%"}}>
                         <VictoryChart
-                        width={400}
-                        height={230}
+                        width={Dimensions.get('window').width * 0.95}
+                        height={Dimensions.get('window').height / 3.7}
                         // data={chartData}
                         theme={chartTheme}
                         >
-                        <VictoryAxis dependentAxis={true} label={weekMonthYear != 2 ? "Time (mins)": "Time (hrs)"}/>
+                        <VictoryAxis dependentAxis={true} label={weekMonthYear != 2 ? "Time (mins)": "Time (hrs)"} />
                         { weekMonthYear == 1?
                         <VictoryAxis label={currentMonth}  /> : <VictoryAxis /> 
                         }
                         <VictoryBar
                             data={chartData}
-                            style={{data: {stroke: theme.colors.TEXT,fill: "#5F7CA6", width: 14}}}
+                            style={{data: {stroke: theme.colors.TEXT,fill: "#5F7CA6", width: 18}}}
                             // labels={datum => datum.toString()}
-                            labelComponent={<VictoryTooltip renderInPortal={false} style={{fontSize: 16, padding: 3}}/>}
+                            labelComponent={<VictoryTooltip renderInPortal={false} style={{fontSize: theme.typography.size.SM, padding: 3}}/>}
                             // style={{
                             //     data: {fill: "tomato", width: 20}
                             //   }}
                         />
                         </VictoryChart>
+                        </View>
                     </View>: 
                     <View>
                         <Text style={[style.statText, style.practiceSessionHeaderText, {textAlign: "center"}]}>No Data</Text>
                     </View>
 
                     }
+                    </View>
                 </View>
                 { thisMonthsSessions != null ?
                 <View style={style.practiceSessionHeader}> 
@@ -377,10 +393,10 @@ const MainPage = ({navigation, route})  => {
                             >                  
                             <View style={style.sessions}>
                                     <View style={{flex: 1, flexDirection: "row", justifyContent:"center"}}>
-                                        <Text style={{fontSize: 22, color: theme.colors.TEXT, flex: 0.8, alignSelf:"center", paddingLeft:10}}>{makeDateLookNice(data.date)}</Text>
+                                        <Text style={{fontSize:theme.typography.size.SM, color: theme.colors.TEXT, flex: 0.8, alignSelf:"center", paddingLeft:10}}>{makeDateLookNice(data.date)}</Text>
                                         <View style={{alignItems: "center", flex: 0.2, backgroundColor:"white",alignContent:"center",justifyContent:"center", borderTopRightRadius:9,borderBottomRightRadius:9,borderWidth:1}}>
-                                            <Text style={{color: theme.colors.TEXT_SECONDARY, fontSize: 22, textAlign:"center",fontWeight:"600"}}>{data.practiceTime}</Text>
-                                            <Text style={{color: theme.colors.TEXT_SECONDARY, fontSize: 22, textAlign:"center", fontWeight:"600"}}> mins</Text>
+                                            <Text style={{color: theme.colors.TEXT_SECONDARY, fontSize: theme.typography.size.SM, textAlign:"center",fontWeight:"600"}}>{data.practiceTime}</Text>
+                                            <Text style={{color: theme.colors.TEXT_SECONDARY, fontSize: theme.typography.size.SM, textAlign:"center", fontWeight:"600"}}> mins</Text>
                                         </View>
                                     </View>
                                     {/* <Text style={{color: "white", fontSize: 15}}>{data.practiceTime} mins</Text> */}
@@ -402,7 +418,8 @@ const styles = theme => StyleSheet.create({
         height: 400
     },
     dateHeader : {
-        fontSize: 25
+        // fontSize: 25,
+        fontSize: theme.typography.size.M
     },
     pSessionContainer: {
         backgroundColor: "white",
@@ -410,8 +427,12 @@ const styles = theme => StyleSheet.create({
     },
     sessions : {
         backgroundColor: theme.colors.SECONDARY,
-        borderWidth: 1,
-        margin: 10,
+        // borderWidth: 1,
+        // margin: 10,
+        width:"90%",
+        alignSelf:"center",
+        marginTop: 10,
+        marginBottom: 10,
         // padding: 5,
         borderRadius: 10,
         height: 60
@@ -422,13 +443,15 @@ const styles = theme => StyleSheet.create({
     },
     statText: {
         color: theme.colors.TEXT,
-        fontSize: 20,
+        // fontSize: 20,
+        fontSize: theme.typography.size.M
     },
     myChart: {
         padding: 5,
         // borderWidth: 2,
         // margin: 10,
-        borderRadius: 15,
+        borderRadius: 10,
+        margin: 10,
         width: 400,
         height: 250,
         justifyContent: "center",
@@ -438,37 +461,50 @@ const styles = theme => StyleSheet.create({
     statBubble: {
         backgroundColor:theme.colors.SECONDARY,
         flex: 0.5,
-        margin: 10,
-        padding: 6,
-        borderRadius: 15
+        marginBottom: 10,
+        marginTop: 10,
+        padding: 10,
+        borderRadius: 10,
+        // shadowColor:theme.colors.TEXT,
+        // shadowOffset: {
+        //     width: 2,
+        //     height: 2
+        // },
+        // shadowOpacity: 0.5,
+        // shadowRadius: 0.8
     },
     statBubbleTop: {
         flexDirection: "row",
-        alignItems :"center",
+        alignItems :"center"
     },
     acticeColor: {
         backgroundColor: "white"
     },
     statBubbleHeader: {
-        fontSize: 21,
+        // fontSize: 21
+        fontSize: theme.typography.size.SM
     },
     statTextColor: {
         color: theme.colors.TEXT
     },
     chartTitle: {
-        fontSize: 20,
+        // fontSize: 20,
+        fontSize: theme.typography.size.SM,
         marginTop: 0,
         marginBottom: -25,
-        marginLeft: 20
     },
     statFont: {
-        fontSize : 18
+        fontSize: theme.typography.size.SM - 1,
+        textAlign:"center"
     },
     practiceSessionHeader:{
-        margin: 10,
-        padding: 5
+        // margin: 10,
+        width:"90%",
+        alignSelf:"center",
+        marginTop:5,
+        marginBottom: 5
     },
     practiceSessionHeaderText: {
-        fontSize: 25
+        fontSize: theme.typography.size.M
     }
 });

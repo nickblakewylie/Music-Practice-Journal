@@ -1,12 +1,12 @@
 {
   "expo": {
-    "name": "MusicApp",
-    "slug": "MusicApp",
-    "version": "1.0.0",
+    "name": "MusicJournal",
+    "slug": "MusicJournal",
+    "version": "2.0.2",
     "orientation": "portrait",
-    "icon": "./assets/guitar.png",
+    "icon": "./assets/music_icon.png",
     "notification" : {
-      "icon" : "./assets/guitar.png"
+      "icon" : "./assets/music_icon.png"
     },
     "plugins": [
       [
@@ -14,15 +14,15 @@
         {
           "color": "blue",
           "mode": "production",
-          "icon": "./assets/guitar.png",
+          "icon": "./assets/music_icon.png",
           "sound" : ["./assets/monk.mp3"]
         }
       ]
     ],
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/guitar_splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#E8DCB8"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -31,15 +31,25 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.musiclogtracker123.ios"
+      "supportsTablet": false,
+      "bundleIdentifier": "com.musiclogtracker123.ios",
+      "config" : {
+        "googleMobileAdsAppId":"ca-app-pub-5263616863180217~4145689603"
+      },
+      "infoPlist":{
+        "NSCameraUsageDescription": "This app needs camera access to take videos during your practice sessions",
+        "NSMicrophoneUsageDescription": "This app needs microphone access to record the audio during your practice sessions"
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.nick_wylie.music_tracker"
+      "package": "com.nick_wylie.music_tracker",
+      "config" : {
+        "googleMobileAdsAppId":"ca-app-pub-5263616863180217~4145689603"
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"

@@ -8,14 +8,14 @@ import uuid from 'react-native-uuid';
 import { RECORDING_OPTION_IOS_OUTPUT_FORMAT_ILBC } from 'expo-av/build/Audio';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {PracticeSessions} from '../PracticeSessions';
+import {SetLists} from '../SetLists'
 import useTheme from '../myThemes/useTheme';
 import useThemedStyles from '../myThemes/useThemedStyles';
+import DropDownPicker from 'react-native-dropdown-picker';
+
 function AddPractice() {
     const theme = useTheme();
     const style = useThemedStyles(styles);
-    function clicked(){
-        console.log("clicked")
-    }
     const wavesAnim = useRef(new Animated.Value(0)).current
     const createWaves = () => {
         Animated.timing(wavesAnim, {
@@ -40,24 +40,49 @@ function AddPractice() {
     const [status, setStatus] = React.useState({});
     const [downloadedVid, setDownloadedVid] = useState(null)
 
+    const [practiceSong, setPracticeSong] = useState(null);
+
     const {practiceSessions, setPracticeSessions} = useContext(PracticeSessions)
+    const {setLists, setMySetList} = useContext(SetLists)
 
-
+    const [dropDownOpen, setDropDownOpen] = useState(false)
+    const [dropDownItems, setDropDownItems] = useState([
+      ]);
     async function askForCameraPermission(){
         const { status } = await Camera.requestCameraPermissionsAsync();
-        setHasPermission(status === 'granted');
+        const { microphone } = await Camera.requestMicrophonePermissionsAsync()
+        setHasPermission(status === 'granted' && microphone == 'granted');
 
+    }
+    function createTheDropDownList(){
+        var newDropDown = []
+        if(setLists != null){
+            for(var i =0; i < setLists.length; i ++){
+                if(setLists[i].songName != null){
+                    newDropDown.push({
+                        label : setLists[i].songName,
+                        value: setLists[i].songName
+                    })
+                }
+            }
+            setDropDownItems(newDropDown)
+        }
     }
     useEffect(() => {
         // createWaves()
-        setDownloading(false);
         (async () => {
+            setDownloading(false);
           const { status } = await Camera.requestCameraPermissionsAsync();
-          const { microphone } = await Camera.requestMicrophonePermissionsAsync()
-          setHasPermission(status === 'granted' && microphone == 'granted');
+        //   const { microphone } = await Camera.requestMicrophonePermissionsAsync()
+          console.log(status)
+        //   console.log(microphone)
+          setHasPermission(status === 'granted');
+          createTheDropDownList()
         })();
       }, []);
-
+      useEffect(() => {
+          createTheDropDownList()
+      },[JSON.stringify(setLists)])
       function checkInputsAreCorrect(){
           if(practiceTime != null &&  Number.isInteger(Number(practiceTime)) && Number(practiceTime) > 0 && Number(practiceTime) < 1000){
               if( quality != null && Number.isInteger(Number(quality)) && Number(quality) > 0 && Number(quality) < 11){
@@ -93,7 +118,6 @@ function AddPractice() {
                 from: videoUri,
                 to: fileName
                 });
-                console.log(fileName)
                 setDownloadedVid(fileName)
                 await storePracticeSession(fileName)
             }
@@ -107,18 +131,21 @@ function AddPractice() {
             setDownloadedVid(null);
             setNotes(null);
             setQuality(null);
+            setDropDownOpen(false)
+            setPracticeSong(null);
         }
       }
     const storePracticeSession = async (newFileName) => {
-        var getPracticeSession = await AsyncStorage.getItem('practiceSessions');
+        var getPracticeSession = [];
+        getPracticeSession = await AsyncStorage.getItem('practiceSessions');
         getPracticeSession = getPracticeSession != null ? JSON.parse(getPracticeSession) : null
-        console.log(getPracticeSession)
         const sessionInfo = {
             date : new Date(),
             practiceTime : practiceTime,
             notes: notes,
             quality: quality,
-            videoUri : newFileName
+            videoUri : newFileName,
+            practiceSong: practiceSong
         }
         if(getPracticeSession == null){
             getPracticeSession = [sessionInfo]
@@ -135,8 +162,6 @@ function AddPractice() {
                 setRecording(true)
                 let video = await camera.recordAsync()
                 setVideoUri(video.uri)
-                console.log("This is the video uri")
-                console.log(video.uri)
             }
             else{
                 setRecording(false);
@@ -164,11 +189,11 @@ function AddPractice() {
             >
                 <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss()}}>
                 <View style={style.practiceContainer}>
-                        <View>
-                            <View style={{margin: 5, marginBottom:15}}>
+                    {/* <View style={{width: "90%", alignSelf:"center"}}> */}
+                            <View style={{marginBottom:10, width:"90%", alignSelf:"center"}}>
                                 <Text style={style.practiceSessionTitle}>Practice Session</Text>
                             </View>
-                            <View>
+                            <View style={{width: "90%",alignSelf:"center"}}>
                                 <Text style={style.inputHeader}>Time (mins)</Text>
                                 <TextInput 
                                     style={style.practiceInfoText}
@@ -180,7 +205,7 @@ function AddPractice() {
                                     maxLength={3}
                                  />
                             </View>
-                            <View >
+                            <View style={{width: "90%",alignSelf:"center"}}>
                                 <Text style={style.inputHeader}>Quality of Session</Text>
                                 <TextInput 
                                         style={style.practiceInfoText}
@@ -191,7 +216,7 @@ function AddPractice() {
                                         keyboardType="number-pad"
                                     />
                             </View>
-                            <View>
+                            <View style={{width: "90%",alignSelf:"center"}}>
                                 <Text style={style.inputHeader} >Notes For Session</Text>
                                 <TextInput 
                                     style={style.notesInfo}
@@ -203,7 +228,8 @@ function AddPractice() {
                                     multiline
                                 />
                             </View>
-                                <View>
+                            <View style={{width:"100%"}} >
+                                <View style={{width: "90%",alignSelf:"center"}}>
                                     <Text style={style.inputHeader}>Record Video</Text>
                                 
                             { videoUri ?
@@ -212,7 +238,7 @@ function AddPractice() {
                                      onPress={() => deleteVideoUri()}
                                      style={style.deleteRecordedVideoButton}
                                 >
-                                    <Text style={{fontSize: 25, color: theme.colors.BACKGROUND, fontWeight:"bold"}}>X</Text>
+                                    <Text style={{fontSize: theme.typography.size.M, color: theme.colors.BACKGROUND, fontWeight:"bold"}}>X</Text>
                                 </Pressable>
                                 <Video
                                     ref={video}
@@ -225,22 +251,37 @@ function AddPractice() {
                                 />
                             </View> : 
                                     <TouchableOpacity
-                                    style={{alignSelf:"center"}}
+                                    style={style.myVideoContainer}
                                     onPress={() => {
-                                        if(hasPermission !== 'granted'){
-                                            askForCameraPermission().then(res => {
-                                                setCameraVisible(true);
-                                            })
+                                        console.log("has permission = " + hasPermission)
+                                        if(hasPermission !== true){
+                                            Alert.alert("Oops", "To record your practices you need to allow access to your camera",[{text: "OK"}])
+                                        }else{
+                                            setCameraVisible(true);
                                         }
-                                        setCameraVisible(true);
                                     }}
                                     >
-                                        <View style={style.myVideoContainer}>
-                                            <Ionicons name="camera"  size={40} color={theme.colors.TEXT_SECONDARY} style={{textAlign: "center"}}/>
-                                            <Text style={{textAlign:"center", color: theme.colors.TEXT_SECONDARY}}>Take Video (optional) </Text>
-                                        </View>
+                                            <Ionicons name="camera"  size={theme.typography.size.L} color={theme.colors.TEXT_SECONDARY} style={{textAlign: "center"}}/>
+                                            <Text style={{textAlign:"center", color: theme.colors.TEXT_SECONDARY, fontSize:theme.typography.size.S }}>Take Video (optional) </Text>
                                     </TouchableOpacity>
                             }
+                            </View>
+                            
+                            {
+                                        dropDownItems != null && dropDownItems.length > 0 ?
+                                        <View style={{width: "90%",alignSelf:"center"}} >
+                                    <Text style={style.inputHeader}>Song Your Working On</Text>
+                                        <DropDownPicker
+                                            open={dropDownOpen}
+                                            value={practiceSong}
+                                            items={dropDownItems}
+                                            setOpen={setDropDownOpen}
+                                            setValue={setPracticeSong}
+                                            style={style.practiceInfoText}
+                                            dropDownDirection="TOP"
+                                        /> 
+                                </View>
+                                : <View></View>}
                             </View>
                             <View style={style.exitSaveButtonsContainer}>
                                 <Pressable
@@ -251,12 +292,14 @@ function AddPractice() {
                                     setDownloadedVid(null);
                                     setNotes(null);
                                     setQuality(null);
+                                    setDropDownOpen(false);
+                                    setPracticeSong(null);
                                 }}
-                                style={style.exitSaveButtons}
+                                style={[style.exitSaveButtons, {marginRight: 5}]}
                                 >
                                     <Text style={style.exitButtonsStyle}>Cancel</Text>
                                 </Pressable>
-                                <View style={[style.exitSaveButtons, style.rightSide]}>
+                                <View style={[style.exitSaveButtons, style.rightSide, {marginLeft: 5}]}>
                                     <TouchableOpacity
                                         onPress={downloadFile}
                                         >
@@ -267,7 +310,6 @@ function AddPractice() {
                                     </TouchableOpacity>
                                 </View>
                             </View>
-                        </View>
                         <Modal 
                         animationType="fade"
                         transparent="true"
@@ -291,8 +333,11 @@ function AddPractice() {
                                                 ? Camera.Constants.Type.front
                                                 : Camera.Constants.Type.back
                                             );
+                                            if(recording){
+                                                startRecord()
+                                            }
                                             }}>
-                                            <Text style={{fontSize: 20,  color: theme.colors.TEXT}}> Flip </Text>
+                                            <Text style={{fontSize: theme.typography.size.SM,  color: theme.colors.TEXT}}> Flip </Text>
                                         </TouchableOpacity>
                                         <TouchableOpacity
                                         style={style.button}
@@ -306,7 +351,7 @@ function AddPractice() {
                                             setModalVisible(true)
                                         }}
                                         style={style.button}>
-                                            <Text style={{fontSize: 20, color: theme.colors.TEXT}}>Back button</Text>
+                                            <Text style={{fontSize: theme.typography.size.SM, color: theme.colors.TEXT}}>Back button</Text>
                                         </TouchableOpacity>
                                     </View>
                                 </Camera> 
@@ -323,13 +368,13 @@ function AddPractice() {
                             </View>
                             }
                         </Modal>
-                </View>
-                </TouchableWithoutFeedback>
+                        </View>
+                </TouchableWithoutFeedback> 
             </Modal>
             <TouchableOpacity onPress={() => {setModalVisible(true)}} >
             <Ionicons style={style.addButton} name="add-circle-outline" size={100} color={theme.colors.TEXT}/>
             </TouchableOpacity>
-            <Text style={style.addPracticeText} >Add Your Practice Session</Text>
+            <Text style={style.addPracticeText}>Add Your Practice Session</Text>
         </View>
     )
 }
@@ -368,46 +413,51 @@ const styles = theme => StyleSheet.create({
     },
     practiceSessionTitle: {
         color: theme.colors.TEXT,
-        fontSize: 35,
+        fontSize: theme.typography.size.L,
         fontWeight: "bold" 
     },
     practiceInfoText: {
         color: theme.colors.TEXT_SECONDARY,
-        height: 50,
+        height: Dimensions.get('window').height / 18,
         borderWidth: 1,
         padding: 10,
         backgroundColor: "white",
-        margin: 5,
-        marginBottom: 23,
-        width: 350,
+        // margin: 5,
+        marginBottom: Dimensions.get('window').height / 41,
+        width: "100%",
         borderRadius: 15,
-        padding:10
+        padding:10,
+        fontSize: theme.typography.size.XS
     },
     notesInfo: {
         color: theme.colors.TEXT_SECONDARY,
-        height: 80,
+        height: Dimensions.get('window').height /12,
         borderWidth: 1,
         padding: 10,
         backgroundColor: "white",
-        margin: 5,
+        marginBottom: 5,
+        marginTop: 5,
         padding:10,
-        width: 350,
-        borderRadius: 15
+        width: "100%",
+        borderRadius: 15,
+        fontSize: theme.typography.size.XS
     },
     myVideoContainer: {
         color: theme.colors.TEXT_SECONDARY,
-        height: 210,
+        // height was 210
+        height: Dimensions.get('window').height /4.4,
         borderWidth: 1,
         backgroundColor: "white",
-        margin: 5,
-        width: 350,
+        marginBottom: 5,
+        marginTop: 5,
+        width: "100%",
         borderRadius: 16,
         justifyContent: "center",
         alignItems: "center"
     },
     inputHeader: {
-        margin: 5,
-        fontSize: 18,
+        marginBottom: 3,
+        fontSize: theme.typography.size.SM,
         color: theme.colors.TEXT,
     },
     addButton: {
@@ -423,7 +473,7 @@ const styles = theme => StyleSheet.create({
     },
     addPracticeText: {
         color: theme.colors.TEXT,
-        fontSize: 25,
+        fontSize: theme.typography.size.M,
         fontWeight: "900"
     },
     container: {
@@ -435,10 +485,11 @@ const styles = theme => StyleSheet.create({
     },
     practiceContainer : {
         flex: 1,
+        flexDirection:"column",
         backgroundColor: theme.colors.BACKGROUND,
         alignItems: 'center',
         color: "#CF5C36",
-        paddingTop: 60
+        paddingTop: Dimensions.get('window').height / 18,
     },
     absoluteFill : {
       backgroundColor: theme.colors.ACCENT,
@@ -448,16 +499,23 @@ const styles = theme => StyleSheet.create({
     exitSaveButtonsContainer: {
         flex: 1,
         flexDirection: "row",
+        width:"90%",
+        alignSelf:"center",
+        // bottom: Dimensions.get('window').height/ 20,
+        // position: "absolute",
+        // justifyContent:"center",
+        // alignSelf:"center",
+        // left: 0
     },
     exitSaveButtons: {
         backgroundColor: "white",
         position: "absolute",
         justifyContent:"center",
-        alignSelf:"flex-end",
-        height: 50,
-        width: 160,
-        bottom: 50,
-        margin: 5,
+        // alignSelf:"flex-end",
+        height: Dimensions.get('window').height/ 18,
+        width: "48%",
+        bottom: Dimensions.get('window').height/ 20,
+        // margin: 5,
         borderRadius: 15
     },
     rightSide:{
@@ -465,7 +523,7 @@ const styles = theme => StyleSheet.create({
         backgroundColor: theme.colors.ACCENT,
     },
     exitButtonsStyle: {
-        fontSize: 18,
+        fontSize: theme.typography.size.SM,
         textAlign: "center",
         color: theme.colors.TEXT_SECONDARY
     },

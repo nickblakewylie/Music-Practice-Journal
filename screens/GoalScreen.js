@@ -10,6 +10,7 @@ import { PracticeSessions } from '../PracticeSessions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import * as Progress from 'react-native-progress';
+import { useFocusEffect } from '@react-navigation/native';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -32,8 +33,11 @@ function GoalScreen() {
     const style = useThemedStyles(styles);
     const [active, setActive] = useState(0);
     const scrollRef = useRef();
+    const [dailyGoalTemp, setDailyGoalTemp] = useState(null)
     const [dailyGoal, setDailyGoal] = useState(null)
+    const [weeklyGoalTemp, setWeeklyGoalTemp] = useState(null)
     const [weeklyGoal, setWeeklyGoal] = useState(null)
+    const [monthlyGoalTemp, setMonthlyGoalTemp] = useState(null)
     const [monthlyGoal, setMonthlyGoal] = useState(null)
     const [dailyProgressPercent,setDailyProgressPercent] = useState(0)
     const [weeklyProgressPercent, setWeeklyProgressPercent] = useState(0)
@@ -46,22 +50,22 @@ function GoalScreen() {
     const [weeklyModal, setWeeklyModal] = useState(false);
     const [monthlyModal, setMonthlyModal] = useState(false)
     const [notificationModal, setNotificationModal] = useState(false)
-    useEffect(() => {
-        registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
+    // useEffect(() => {
+    //     registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
     
-        notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-          setNotification(notification);
-        });
+    //     notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+    //       setNotification(notification);
+    //     });
     
-        responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-          console.log(response);
-        });
+    //     responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+    //       console.log(response);
+    //     });
     
-        return () => {
-          Notifications.removeNotificationSubscription(notificationListener.current);
-          Notifications.removeNotificationSubscription(responseListener.current);
-        };
-      }, []);  
+    //     return () => {
+    //       Notifications.removeNotificationSubscription(notificationListener.current);
+    //       Notifications.removeNotificationSubscription(responseListener.current);
+    //     };
+    //   }, []);  
       const onChange = (event, selectedDate) => {
         const currentDate = selectedDate || date;
         setShow(Platform.OS === 'ios');
@@ -111,47 +115,49 @@ function GoalScreen() {
     }
     function checkIfDatesAreSameMonth(date1, date2){
       if(date1.getMonth() == date2.getMonth() && date1.getFullYear() == date2.getFullYear()){
-        console.log("they are the same")
         return true
       }else{
         return false
       }
     }
     function getThisMonthsPracticeMins(){
-      var todaysDate = new Date()
-      var thisMonthsSession = practiceSessions.filter(d => checkIfDatesAreSameMonth(new Date(d.date), todaysDate) == true)
-      var thisMonthsMins = 0 
-      console.log("Length of months sessions " + thisMonthsSession.length)
-      for(var p = 0; p < thisMonthsSession.length; p ++){
-        if(thisMonthsSession[p].practiceTime != null && Number(thisMonthsSession[p].practiceTime) != null){
-          console.log("session mins" + thisMonthsSession[p].practiceTime)
-          thisMonthsMins += Number(thisMonthsSession[p].practiceTime)
+      if(practiceSessions != null){
+        var todaysDate = new Date()
+        var thisMonthsSession = practiceSessions.filter(d => checkIfDatesAreSameMonth(new Date(d.date), todaysDate) == true)
+        var thisMonthsMins = 0 
+        for(var p = 0; p < thisMonthsSession.length; p ++){
+          if(thisMonthsSession[p].practiceTime != null && Number(thisMonthsSession[p].practiceTime) != null){
+            thisMonthsMins += Number(thisMonthsSession[p].practiceTime)
+          }
         }
+        setMonthlyPracticeMins(thisMonthsMins)
       }
-      console.log("Here is this months mins " + thisMonthsMins)
-      setMonthlyPracticeMins(thisMonthsMins)
     }
     function getTodaysPracticeMins(){
-      var todaysDate = new Date();
-      var sessionsToday = practiceSessions.filter(d => checkifDateIsSame(new Date(d.date), todaysDate) == true)
-      var todaysMins = 0
-      for(var j = 0; j < sessionsToday.length; j ++){
-        if(sessionsToday[j].practiceTime != null && Number(sessionsToday[j].practiceTime) != null){
-          todaysMins += Number(sessionsToday[j].practiceTime)
+      if(practiceSessions != null){
+        var todaysDate = new Date();
+        var sessionsToday = practiceSessions.filter(d => checkifDateIsSame(new Date(d.date), todaysDate) == true)
+        var todaysMins = 0
+        for(var j = 0; j < sessionsToday.length; j ++){
+          if(sessionsToday[j].practiceTime != null && Number(sessionsToday[j].practiceTime) != null){
+            todaysMins += Number(sessionsToday[j].practiceTime)
+          }
         }
+        setTodaysPracticeMins(todaysMins)
       }
-      setTodaysPracticeMins(todaysMins)
     }
     function getThisWeeksPracticeMins(){
-      var weekDays = getDayNumbersPastWeek()
-      var week  = practiceSessions.filter(el => checkIfDateInWeekArray(el.date, weekDays) == true)
-      var practiceMins = 0
-      for(var i = 0; i < week.length; i ++){
-        if(week[i] != null && Number(week[i].practiceTime) != null){
-          practiceMins += Number(week[i].practiceTime)
+      if(practiceSessions != null){
+        var weekDays = getDayNumbersPastWeek()
+        var week  = practiceSessions.filter(el => checkIfDateInWeekArray(el.date, weekDays) == true)
+        var practiceMins = 0
+        for(var i = 0; i < week.length; i ++){
+          if(week[i] != null && Number(week[i].practiceTime) != null){
+            practiceMins += Number(week[i].practiceTime)
+          }
         }
+        setWeeklyPracticeMins(practiceMins)
       }
-      setWeeklyPracticeMins(practiceMins)
   }
   function checkIfDateInWeekArray(currentDay, weekDays){
     const tempD = new Date(currentDay)
@@ -178,16 +184,18 @@ function GoalScreen() {
         // console.log("Daily Goals value")
         // console.log(value)
         setDailyGoal(value)
+        setDailyGoalTemp(value);
         // console.log("daily goal set to " + Number(value))
       }
       if(weeklyG !== null){
         setWeeklyGoal(weeklyG)
+        setWeeklyGoalTemp(weeklyG)
       }
       if(monthlyG !== null){
         setMonthlyGoal(monthlyG)
+        setMonthlyGoalTemp(monthlyG)
       }
     }catch(e){
-      console.log(e)
     }
   }
 
@@ -244,49 +252,48 @@ function GoalScreen() {
   }
   async function storeDailyGoals(){
     if(checkInputsAreCorrect('daily') == true){
+      setDailyModal(false)
+      setDailyGoalTemp(dailyGoal)
       await storeData("dailyGoal", dailyGoal)
-      calculateDailyProgressPercent()
     }
   }
   async function storeWeeklyGoals(){
     if(checkInputsAreCorrect('weekly') == true){
+      setWeeklyModal(false)
+      setWeeklyGoalTemp(weeklyGoal)
       await storeData("weeklyGoal", weeklyGoal)
-      calculateWeeklyProgressPercent()
     }
   }
   async function storeMonthlyGoals(){
     if(checkInputsAreCorrect('monthly') == true){
+      setMonthlyModal(false)
+      setMonthlyGoalTemp(monthlyGoal)
       await storeData("monthlyGoal", monthlyGoal)
-      calculateMonthlyProgressPercent()
       
     }
   }
   function calculateWeeklyProgressPercent(){
-    if(weeklyGoal == 0 || weeklyGoal == null){
+    if(weeklyGoalTemp == 0 || weeklyGoalTemp == null){
       setWeeklyProgressPercent(0)
     }
     else{
-      setWeeklyProgressPercent(Math.round(weeklyPracticeMins/(Number(weeklyGoal) * 60) * 10)/ 10)
+      setWeeklyProgressPercent(Math.round(weeklyPracticeMins/(Number(weeklyGoalTemp) * 60) * 10)/ 10)
     }
   }
   function calculateMonthlyProgressPercent(){
-    if(monthlyGoal == 0 || monthlyGoal == null){
+    if(monthlyGoalTemp == 0 || monthlyGoalTemp == null){
       setWeeklyProgressPercent(0)
     }
     else{
-      console.log("calculating monthly practice goal")
-      console.log(monthlyPracticeMins )
-      console.log(monthlyGoal)
-      setMonthlyProgressPercent(Math.round(monthlyPracticeMins/(Number(monthlyGoal) * 60)* 10) / 10)
+      setMonthlyProgressPercent(Math.round(monthlyPracticeMins/(Number(monthlyGoalTemp) * 60)* 10) / 10)
     }
   }
   function calculateDailyProgressPercent(){
-    if(dailyGoal == 0 || dailyGoal == null){
+    if(dailyGoalTemp == 0 || dailyGoalTemp == null){
       setDailyProgressPercent(0)
     }
     else{
-      console.log("daily progress " +Math.round(todaysPracticeMins/Number(dailyGoal) * 10) / 10)
-      setDailyProgressPercent(Math.round(todaysPracticeMins/Number(dailyGoal) * 10) / 10)
+      setDailyProgressPercent(Math.round(todaysPracticeMins/Number(dailyGoalTemp) * 10) / 10)
     }
   }
   async function schedulePushNotification() {
@@ -314,7 +321,6 @@ function GoalScreen() {
           return;
         }
         token = (await Notifications.getExpoPushTokenAsync()).data;
-        console.log(token);
       } else {
         alert('Must use physical device for Push Notifications');
       }
@@ -330,12 +336,11 @@ function GoalScreen() {
     
       return token;
     }
-
     useEffect(() => {
       getThisWeeksPracticeMins()
       getTodaysPracticeMins()
       getThisMonthsPracticeMins()
-  }, [practiceSessions])
+  }, [JSON.stringify(practiceSessions)])
     useEffect(() => {
       getGoals()
       getThisWeeksPracticeMins()
@@ -346,11 +351,9 @@ function GoalScreen() {
       calculateWeeklyProgressPercent()
       calculateMonthlyProgressPercent()
       calculateDailyProgressPercent()
-    }, [weeklyPracticeMins, todaysPracticeMins, monthlyPracticeMins, dailyGoal, monthlyGoal, weeklyGoal])
-    
+    }, [weeklyPracticeMins, todaysPracticeMins, monthlyPracticeMins, dailyGoalTemp, monthlyGoalTemp, weeklyGoalTemp])
     return (
         <View style={style.container}>
-            <View>
                 <View style={style.titleContainer}>
                         <TouchableOpacity 
                         style={[style.titleBlock, {backgroundColor : active == 0? theme.colors.SECONDARY: "white", borderWidth: 1, borderColor: theme.colors.ACCENT},{borderTopLeftRadius: 14, borderBottomLeftRadius: 14}]}
@@ -367,8 +370,7 @@ function GoalScreen() {
                           onPress={() => {setActive(2); changeGoal(2)}}>
                             <Text style={[style.myTitle, {color: active == 2 ? theme.colors.TEXT: theme.colors.TEXT_SECONDARY}]} >Monthly</Text>
                         </TouchableOpacity>
-                    </View>
-                </View>
+              </View>
             <ScrollView ref={scrollRef} horizontal={true} decelerationRate={0} snapToAlignment={"center"} snapToInterval={Dimensions.get('window').width} onScroll={event => { 
               // scroll animation ended
               const xA  = event.nativeEvent.contentOffset.x;
@@ -382,7 +384,6 @@ function GoalScreen() {
               else if(xA >= Dimensions.get('window').width * 2 / 1.3){
                 setActive(2);
               }
-              console.log(xA)
               }}
               scrollEventThrottle={200}
               > 
@@ -395,7 +396,7 @@ function GoalScreen() {
                         {/* <View style={{justifyContent: "center", alignItems:"center", alignContent: "center"}} > */}
                           <View  style={{display:"flex", alignItems: "center", flex: 1}}>
                             <View style={{flex: 0.2}}>
-                              <Text style={style.goalHeaderText} >Daily Goal {dailyGoal ? dailyGoal + " mins" :  "mins"}</Text>
+                              <Text style={style.goalHeaderText} >Daily Goal {dailyGoalTemp ? dailyGoalTemp + " mins" :  "mins"}</Text>
                             </View>
                             <View style={{flexDirection:"row", flex: 0.4, justifyContent:"center", alignItems:"center"}}>
                               <View style={{width: Dimensions.get('window').width / 2, justifyContent:"center"}}>
@@ -475,10 +476,10 @@ function GoalScreen() {
                                   </View>
                                   </TouchableOpacity>
                                   </Modal>
-                                  <Button 
+                                  {/* <Button 
                                   title="Schedule Practice Time"
                                   onPress={() =>setNotificationModal(true)}
-                                  />
+                                  /> */}
                             </View>
                             </View>
                         </View>
@@ -486,7 +487,7 @@ function GoalScreen() {
                 <View style={{width: Dimensions.get('window').width - 100 ,marginHorizontal: 50}}>
                   <View style={{display:"flex", alignItems: "center", flex: 1}}>
                         <View style={{flex:0.2}}>
-                            <Text style={style.goalHeaderText} >Weekly Goal {weeklyGoal ? weeklyGoal + " hrs" : "not set" } </Text>   
+                            <Text style={style.goalHeaderText} >Weekly Goal {weeklyGoalTemp ? weeklyGoalTemp + " hrs" : "not set" } </Text>   
                         </View>
                         <View style={{flexDirection:"row", flex: 0.4, justifyContent:"center"}}>
                               <View style={{width: Dimensions.get('window').width / 2, justifyContent:"center"}}>
@@ -546,7 +547,7 @@ function GoalScreen() {
                         alignItems: 'center'
                     }}>
                         <View style={{flex: 0.2}}>
-                            <Text style={style.goalHeaderText} >Monthly Goal {monthlyGoal ? monthlyGoal + " hrs" :  " not set"}</Text>
+                            <Text style={style.goalHeaderText} >Monthly Goal {monthlyGoalTemp ? monthlyGoalTemp + " hrs" :  " not set"}</Text>
                         </View>
                         <View style={{flexDirection:"row", flex: 0.4}}>
                               <View style={{width: Dimensions.get('window').width / 2, justifyContent:"center"}}>
@@ -587,7 +588,7 @@ function GoalScreen() {
                                           />
                                           <Button
                                           title="Set Goal"
-                                          style={{width: 200}}
+                                          style={{width: 200, backgroundColor: theme.colors.ACCENT}}
                                           onPress={() => storeMonthlyGoals()} />
                                           </View>
                                       </View>
@@ -616,19 +617,20 @@ const styles = theme => StyleSheet.create( {
       },
     myTitle : {
         color: theme.colors.TEXT_SECONDARY,
-        fontSize: 18,
+        fontSize: theme.typography.size.SM,
         textAlign: "center",
     },
     titleContainer :{
         flexDirection: "row",
-        width: "100%",
+        width: "90%",
         alignContent: "flex-end",
-        margin: 20,
+        marginTop: 10,
+        marginBottom: 10,
         backgroundColor: "white",
         borderRadius: 15
     },
     titleBlock : {
-        width: "30%",
+        width: "33.333%",
         padding: 10
     },
     modalContainer: {
@@ -645,7 +647,7 @@ const styles = theme => StyleSheet.create( {
       borderRadius: 15
     },
     practiceTimeInput: {
-      fontSize: 20,
+      fontSize: theme.typography.size.SM,
     },
     chooseGoalButton: {
       width: 200,
@@ -656,10 +658,11 @@ const styles = theme => StyleSheet.create( {
     buttonText: {
       color: theme.colors.TEXT_SECONDARY,
       textAlign:"center",
-      fontSize:14 
+      // fontSize:16 
+      fontSize: theme.typography.size.S
     },
     goalHeaderText: {
-      fontSize: 25,
+      fontSize: theme.typography.size.M,
       color: theme.colors.TEXT
     }
 })

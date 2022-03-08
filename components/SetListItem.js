@@ -19,7 +19,7 @@ function SetListItem({name, difficulty, pTime}) {
                 <Text style={style.setListText}>{difficulty}</Text>
             </View>
             <View style={style.editContainer}>
-                <Text style={[style.setListText, {color: theme.colors.TEXT_SECONDARY}]}>{pTime} mins</Text>
+                <Text style={[style.setListText, {color: theme.colors.TEXT_SECONDARY}]}>{pTime > 60 ? Math.round(pTime / 60 * 100) / 100 + " hrs" : pTime + " mins"}</Text>
             </View>
         </View>
     )

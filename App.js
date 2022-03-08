@@ -67,7 +67,7 @@ function HomeTabs({route}){
       headerStyle:{backgroundColor: theme.colors.ACCENT}
     })}
   >
-    <Tab.Screen name="Add Practice" options={{headerTitle: () => <Header name="Music Tracker" />}}  component={AddPractice} />
+    <Tab.Screen name="Add Practice" options={{headerTitle: () => <Header name="Add Practice" />}}  component={AddPractice} />
     <Tab.Screen name="Home" component={Home} options={{
       headerTitle: () => <Header name="Home" /> 
     }} />
