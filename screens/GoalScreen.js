@@ -650,7 +650,7 @@ const styles = theme => StyleSheet.create( {
       fontSize: theme.typography.size.SM,
     },
     chooseGoalButton: {
-      width: 200,
+      width: "90%",
       backgroundColor: theme.colors.ACCENT,
       borderRadius: 15,
       padding: 10

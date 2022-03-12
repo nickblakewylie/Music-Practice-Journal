@@ -372,7 +372,7 @@ function AddPractice() {
                 </TouchableWithoutFeedback> 
             </Modal>
             <TouchableOpacity onPress={() => {setModalVisible(true)}} >
-            <Ionicons style={style.addButton} name="add-circle-outline" size={100} color={theme.colors.TEXT}/>
+            <Ionicons style={style.addButton} name="add-circle-outline" size={theme.typography.size.XXL} color={theme.colors.TEXT}/>
             </TouchableOpacity>
             <Text style={style.addPracticeText}>Add Your Practice Session</Text>
         </View>

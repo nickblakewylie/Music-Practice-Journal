@@ -18,11 +18,13 @@ export function normalize(size) {
 }
 
 const size = {
+    XXS: normalize(10),
     XS: normalize(14),
     S: normalize(16),
     SM: normalize(18),
     M : normalize(25),
     L: normalize(30),
+    XXL: normalize(80)
   };
   
   const letterSpacing = {

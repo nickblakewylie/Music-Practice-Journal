@@ -2,7 +2,7 @@
   "expo": {
     "name": "MusicJournal",
     "slug": "MusicJournal",
-    "version": "2.0.2",
+    "version": "2.0.9",
     "orientation": "portrait",
     "icon": "./assets/music_icon.png",
     "notification" : {
@@ -33,9 +33,6 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.musiclogtracker123.ios",
-      "config" : {
-        "googleMobileAdsAppId":"ca-app-pub-5263616863180217~4145689603"
-      },
       "infoPlist":{
         "NSCameraUsageDescription": "This app needs camera access to take videos during your practice sessions",
         "NSMicrophoneUsageDescription": "This app needs microphone access to record the audio during your practice sessions"
@@ -48,7 +45,6 @@
       },
       "package": "com.nick_wylie.music_tracker",
       "config" : {
-        "googleMobileAdsAppId":"ca-app-pub-5263616863180217~4145689603"
       }
     },
     "web": {

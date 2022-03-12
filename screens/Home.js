@@ -141,8 +141,6 @@ const MainPage = ({navigation, route})  => {
                     // }
                 }
             }
-            // console.log("time practiced changed")
-            // console.log(timePracticed)
             setTimePracticed(timePracticed / 60)
             if(amountOfSession > 0){
                 setAverageQuality(quality / amountOfSession);
@@ -271,7 +269,7 @@ const MainPage = ({navigation, route})  => {
             style: {
                 tickLabels: {
                     fill: theme.colors.TEXT,
-                    padding: 12,
+                    padding: 5,
                 },
                 axisLabel: {
                     fill: theme.colors.TEXT,
@@ -347,9 +345,9 @@ const MainPage = ({navigation, route})  => {
                         <View style={{width:"100%", alignItems:"center"}}>
                             <Text style={[style.chartTitle,style.statTextColor, {textAlign:"left"}]} >My Practice Sessions</Text>
                         </View>
-                        <View style={{alignSelf:"center", width: "100%"}}>
+                        <View style={{alignSelf:"center", width: "100%", alignItems:"right", alignContent:"center"}}>
                         <VictoryChart
-                        width={Dimensions.get('window').width * 0.95}
+                        width={Dimensions.get('window').width * 0.85}
                         height={Dimensions.get('window').height / 3.7}
                         // data={chartData}
                         theme={chartTheme}
@@ -360,9 +358,14 @@ const MainPage = ({navigation, route})  => {
                         }
                         <VictoryBar
                             data={chartData}
-                            style={{data: {stroke: theme.colors.TEXT,fill: "#5F7CA6", width: 18}}}
+                            style={{data: {stroke: theme.colors.TEXT,fill: "#5F7CA6"},labels:{
+                                fontSize: theme.typography.size.SM, fill:"black"}}}
                             // labels={datum => datum.toString()}
                             labelComponent={<VictoryTooltip renderInPortal={false} style={{fontSize: theme.typography.size.SM, padding: 3}}/>}
+                            animate={{
+                                duration: 200,
+                                onLoad: {duration: 1000}
+                            }}
                             // style={{
                             //     data: {fill: "tomato", width: 20}
                             //   }}
@@ -435,7 +438,7 @@ const styles = theme => StyleSheet.create({
         marginBottom: 10,
         // padding: 5,
         borderRadius: 10,
-        height: 60
+        // height: 60
     },
     statsContainer:{
         flex: 1,

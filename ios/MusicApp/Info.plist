@@ -5,7 +5,7 @@
     <key>CFBundleDevelopmentRegion</key>
     <string>$(DEVELOPMENT_LANGUAGE)</string>
     <key>CFBundleDisplayName</key>
-    <string>MusicTracker</string>
+    <string>MusicJournal</string>
     <key>CFBundleExecutable</key>
     <string>$(EXECUTABLE_NAME)</string>
     <key>CFBundleIdentifier</key>
@@ -17,7 +17,7 @@
     <key>CFBundlePackageType</key>
     <string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
     <key>CFBundleShortVersionString</key>
-    <string>2.0.0</string>
+    <string>2.0.8</string>
     <key>CFBundleSignature</key>
     <string>????</string>
     <key>CFBundleURLTypes</key>
@@ -31,8 +31,6 @@
     </array>
     <key>CFBundleVersion</key>
     <string>1</string>
-    <key>GADApplicationIdentifier</key>
-    <string>ca-app-pub-5263616863180217~4145689603</string>
     <key>LSRequiresIPhoneOS</key>
     <true/>
     <key>NSAppTransportSecurity</key>
@@ -51,9 +49,9 @@
     <key>NSCalendarsUsageDescription</key>
     <string>Allow $(PRODUCT_NAME) to access your calendars</string>
     <key>NSCameraUsageDescription</key>
-    <string>This app requires camera access to take videos during your practice</string>
+    <string>This app needs camera access to take videos during your practice sessions</string>
     <key>NSMicrophoneUsageDescription</key>
-    <string>This app requires microphone access to record the audio during your practice</string>
+    <string>This app needs microphone access to record the audio during your practice sessions</string>
     <key>NSRemindersUsageDescription</key>
     <string>Allow $(PRODUCT_NAME) to access your reminders</string>
     <key>NSUserTrackingUsageDescription</key>

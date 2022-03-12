@@ -25,7 +25,7 @@ const styles = theme => StyleSheet.create( {
     },
     headerText : {
         fontWeight: "bold",
-        fontSize: 20,
+        fontSize: theme.typography.size.SM,
         letterSpacing: 1,
         color: theme.TEXT_SECONDARY,
         textAlign: "center"

@@ -526,7 +526,8 @@ const styles = theme => StyleSheet.create({
         marginBottom: Dimensions.get('window').height / 41,
         width: "100%",
         borderRadius: 15,
-        padding:10
+        padding:10,
+        fontSize: theme.typography.size.XS
     },
     notesInfo: {
         color: theme.colors.TEXT_SECONDARY,
@@ -538,7 +539,8 @@ const styles = theme => StyleSheet.create({
         // marginTop: 5,
         padding:10,
         width: "100%",
-        borderRadius: 15
+        borderRadius: 15,
+        fontSize: theme.typography.size.XS
     },
     myVideoContainer: {
         color: theme.colors.TEXT_SECONDARY,

@@ -39,7 +39,7 @@ const styles = theme => StyleSheet.create({
     },
     setListText:{
         color: theme.colors.TEXT,
-        fontSize: 18,
+        fontSize: theme.typography.size.S,
         margin: 10,
         padding: 6
     },
