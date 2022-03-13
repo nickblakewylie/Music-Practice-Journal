@@ -19,6 +19,7 @@ import { Foundation } from '@expo/vector-icons';
 import useTheme from './myThemes/useTheme';
 import useThemedStyles from './myThemes/useThemedStyles';
 import SetListScreen from './screens/SetListScreen';
+import { UpdatePState } from './UpdatePState';
 function SetList() {
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -80,8 +81,10 @@ function HomeTabs({route}){
 const RootStack = createNativeStackNavigator();
 export default function App() {
   const [practiceSessions, setPracticeSessions] = React.useState(null);
+  const [updatePState, setUpdatePState] = React.useState(1);
   const [setLists, setMySetLists] = React.useState(null);
   const setListValue = React.useMemo(() => ({setLists, setMySetLists}), [setLists, setMySetLists]);
+  const pStateValue = React.useMemo(() => ({updatePState, setUpdatePState}), [updatePState, setUpdatePState])
   const providerValue = React.useMemo(() => ({practiceSessions, setPracticeSessions}), [practiceSessions, setPracticeSessions]);
   const getData = async() => {
     console.log("Screen loaded")
@@ -99,6 +102,7 @@ export default function App() {
   }, [])
   return (
     <NavigationContainer>
+      <UpdatePState.Provider value={pStateValue}>
       <PracticeSessions.Provider value={providerValue}>
       <SetLists.Provider value={setListValue} >
         <ThemeProvider>
@@ -112,6 +116,7 @@ export default function App() {
         </ThemeProvider>
         </SetLists.Provider>
       </PracticeSessions.Provider>
+      </UpdatePState.Provider>
     </NavigationContainer>
   );
 }

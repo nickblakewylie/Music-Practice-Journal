@@ -10,6 +10,8 @@ import useThemedStyles from '../myThemes/useThemedStyles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { SetLists } from '../SetLists';
+import { UpdatePState } from '../UpdatePState';
+
 
 const PracticeSession = ({navigation, route}) =>{
     const theme = useTheme();
@@ -32,6 +34,7 @@ const PracticeSession = ({navigation, route}) =>{
     const [makeEditable,setMakeEditable] = useState(false)
     const {setLists, setMySetList} = useContext(SetLists)
     const {practiceSessions, setPracticeSessions} = useContext(PracticeSessions);
+    const {updatePState, setUpdatePState} = useContext(UpdatePState)
     const [quality, setQuality] = useState(data.quality)
     const [practiceTime, setPracticeTime] = useState(data.practiceTime)
     const [notes, setNotes] = useState(data.notes)
@@ -111,6 +114,7 @@ const PracticeSession = ({navigation, route}) =>{
                     }
                 }
             }
+            setUpdatePState(Math.round(Math.random() * 1000000))
             setPracticeSessions(tempArray)
             await AsyncStorage.setItem('practiceSessions', JSON.stringify(tempArray));
             navigation.navigate('Main', {update:"true"})

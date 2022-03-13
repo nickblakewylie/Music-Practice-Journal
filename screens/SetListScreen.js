@@ -12,6 +12,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useIsFocused, useFocusEffect } from '@react-navigation/native';
 import SongList from '../components/SongList';
 
+import useDeepCompareEffect from 'use-deep-compare-effect'
+import { UpdatePState } from '../UpdatePState';
 function SetListScreen({navigation}) {
     const theme = useTheme();
     const style = useThemedStyles(styles);
@@ -22,6 +24,7 @@ function SetListScreen({navigation}) {
     const [songDifficulty, setSongDifficulty] = useState(null);
     const {setLists, setMySetLists} = useContext(SetLists)
     const {practiceSessions, setPracticeSessions} = useContext(PracticeSessions)
+    const {updatePState, setUpdatePState} = useContext(UpdatePState)
 
     const [timesCalled, setTimesCalled] = useState(0);
     const [newSetList, setNewSetList] = useState(null)
@@ -147,9 +150,18 @@ function SetListScreen({navigation}) {
     //     calculateThePracticeTimes()
     //     console.log("set list has been updated")
     // }, [JSON.stringify(setLists)])
-    useEffect(() =>{
+    // useEffect(() =>{
+    //     calculateThePracticeTimes()
+    //     console.log("practice sessions changed")
+    // }, [JSON.stringify(practiceSessions)])
+    useEffect(() => {
         calculateThePracticeTimes()
-    }, [JSON.stringify(practiceSessions)])
+        console.log("practice session has been called")
+    },[JSON.stringify(practiceSessions)])
+    // useEffect(() => {
+    //     calculateThePracticeTimes()
+    //     console.log("update p times");
+    // }, [updatePState])
     // useEffect(async() =>{
     //     calculateThePracticeTimes()
     // }, [practiceSessions])
