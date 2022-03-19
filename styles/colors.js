@@ -12,6 +12,7 @@ const OLD_PAGE = "#E8DCB8";
 const WHITE = "white";
 const BLACK = "black";
 const OTHER_BLUE = "#15243b"
+const GRAY_BLUE = "#0b1420"
 /////////////////
 const BLUE_GREEN = "#1E352F";
 const GREEN = "#BEEF9E";
@@ -28,6 +29,7 @@ const light = {
  BACKGROUND: DARK_BLUE,
  ACCENT: OLD_PAGE,
  SECONDARY:OTHER_BLUE,
+ THIRD : GRAY_BLUE,
  TEXT: WHITE,
  TEXT_SECONDARY: BLACK,
 };

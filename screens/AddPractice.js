@@ -12,18 +12,37 @@ import {SetLists} from '../SetLists'
 import useTheme from '../myThemes/useTheme';
 import useThemedStyles from '../myThemes/useThemedStyles';
 import DropDownPicker from 'react-native-dropdown-picker';
+import { AdMobBanner } from 'expo-ads-admob';
 
 function AddPractice() {
     const theme = useTheme();
     const style = useThemedStyles(styles);
     const wavesAnim = useRef(new Animated.Value(0)).current
+    const fadeOut = useRef(new Animated.Value(1)).current
     const createWaves = () => {
-        Animated.timing(wavesAnim, {
-            toValue: 500,
-            easing: Easing.back(),
-            duration: 5000
-        }).start()
-        
+        // Animated.parallel([
+        // Animated.sequence([
+        //     Animated.timing(wavesAnim, {
+        //         toValue: Dimensions.get('window').height / 1.7,
+        //         easing: Easing.in(),
+        //         duration: 1000,
+        //         useNativeDriver:false
+        //     })
+        // ]
+        // ),
+        // Animated.timing(fadeOut, {
+        //     toValue: 0,
+        //     easing: Easing.in(),
+        //     duration: 1000,
+        //     useNativeDriver:false
+        // })
+        // ]).start(() => {
+        //     setModalVisible(true)
+        //     Animated.delay(100).start(() =>{
+        //         wavesAnim.setValue(0)
+        //         fadeOut.setValue(1)
+        //     })
+        // })
     }
     const [modalVisible, setModalVisible] = useState(false);
     const [cameraVisible, setCameraVisible] = useState(false);
@@ -135,10 +154,21 @@ function AddPractice() {
             setPracticeSong(null);
         }
       }
+    Date.prototype.addDays = function(days) {
+        var date = new Date(this.valueOf());
+        date.setDate(date.getDate() + days);
+        return date;
+    }
+    Date.prototype.subtractDays = function(days) {
+        var date = new Date(this.valueOf());
+        date.setDate(date.getDate() - days);
+        return date;
+    }
     const storePracticeSession = async (newFileName) => {
         var getPracticeSession = [];
         getPracticeSession = await AsyncStorage.getItem('practiceSessions');
         getPracticeSession = getPracticeSession != null ? JSON.parse(getPracticeSession) : null
+        var myDate = new Date();
         const sessionInfo = {
             date : new Date(),
             practiceTime : practiceTime,
@@ -176,7 +206,7 @@ function AddPractice() {
     return (
         <View style={style.container}>
             {/* <Animated.View 
-            style={{width: wavesAnim, borderRadius:10000,height: wavesAnim, backgroundColor: "white", opacity:1, position: "absolute", zIndex: 0}} >
+            style={{width: wavesAnim, borderRadius:10000,height: wavesAnim, backgroundColor: theme.colors.TEXT, opacity:1, position: "absolute", zIndex: 0}} >
             </Animated.View> */}
             <Modal
             animationType="slide"
@@ -349,6 +379,9 @@ function AddPractice() {
                                         onPress={() => {
                                             setCameraVisible(false)
                                             setModalVisible(true)
+                                            if(recording){
+                                                startRecord()
+                                            }
                                         }}
                                         style={style.button}>
                                             <Text style={{fontSize: theme.typography.size.SM, color: theme.colors.TEXT}}>Back button</Text>
@@ -371,10 +404,26 @@ function AddPractice() {
                         </View>
                 </TouchableWithoutFeedback> 
             </Modal>
-            <TouchableOpacity onPress={() => {setModalVisible(true)}} >
-            <Ionicons style={style.addButton} name="add-circle-outline" size={theme.typography.size.XXL} color={theme.colors.TEXT}/>
-            </TouchableOpacity>
-            <Text style={style.addPracticeText}>Add Your Practice Session</Text>
+            <View style={{width:"100%",alignItems:"center", position:"absolute", top: 0}}>
+                    <AdMobBanner
+                    bannerSize="banner"
+                    adUnitID="ca-app-pub-5263616863180217/9832651621"
+                    onDidFailToReceiveAdWithError={(e) => console.log(e)}
+                    servePersonalizedAds={false}
+                    // style={{padding: 20}}
+                    />
+            </View>
+            <Animated.View 
+                style={{transform:[{translateY:wavesAnim}], opacity: fadeOut}}
+                >
+                <TouchableOpacity onPress={() => {
+                    // createWaves()
+                    setModalVisible(true);
+                    }} style={{alignSelf:"center"}}>
+                    <Ionicons style={style.addButton} name="add-circle-outline" size={theme.typography.size.XXL} color={theme.colors.TEXT}/>
+                </TouchableOpacity>
+                <Text style={style.addPracticeText}>Add Your Practice Session</Text>
+            </Animated.View>
         </View>
     )
 }

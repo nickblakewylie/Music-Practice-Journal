@@ -1,7 +1,7 @@
 import Constants from 'expo-constants';
 import * as Notifications from 'expo-notifications';
 import React, { useState, useEffect, useRef, useContext } from 'react';
-import { Text, View, Button, Platform, StyleSheet, ScrollView, Dimensions, TouchableOpacity, TextInput, Modal, TouchableWithoutFeedback , Alert} from 'react-native';
+import { Text, View, Button, Platform, StyleSheet, ScrollView, Dimensions, TouchableOpacity, TextInput, Modal, TouchableWithoutFeedback , Alert, Animated} from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import useTheme from '../myThemes/useTheme';
 import useThemedStyles from '../myThemes/useThemedStyles';
@@ -11,6 +11,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import * as Progress from 'react-native-progress';
 import { useFocusEffect } from '@react-navigation/native';
+import { AdMobBanner } from 'expo-ads-admob';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -50,6 +51,12 @@ function GoalScreen() {
     const [weeklyModal, setWeeklyModal] = useState(false);
     const [monthlyModal, setMonthlyModal] = useState(false)
     const [notificationModal, setNotificationModal] = useState(false)
+
+
+    // animation
+    const fadeIn = useRef(new Animated.Value(0)).current
+    const fromBottom = useRef(new Animated.Value(Dimensions.get('window').height/ 2)).current
+
     // useEffect(() => {
     //     registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
     
@@ -346,6 +353,18 @@ function GoalScreen() {
       getThisWeeksPracticeMins()
       getTodaysPracticeMins()
       getThisMonthsPracticeMins()
+      Animated.parallel([
+        Animated.timing(fadeIn, {
+          toValue : 1,
+          duration: 1200,
+          useNativeDriver: true
+        }),
+        Animated.timing(fromBottom, {
+          toValue: 0,
+          duration: 1200,
+          useNativeDriver: true
+        })
+      ]).start()
     }, [])
     useEffect(() => {
       calculateWeeklyProgressPercent()
@@ -354,6 +373,15 @@ function GoalScreen() {
     }, [weeklyPracticeMins, todaysPracticeMins, monthlyPracticeMins, dailyGoalTemp, monthlyGoalTemp, weeklyGoalTemp])
     return (
         <View style={style.container}>
+                <View style={{width:"100%",alignItems:"center", top: 0}}>
+                    <AdMobBanner
+                    bannerSize="banner"
+                    adUnitID="ca-app-pub-5263616863180217/9832651621"
+                    onDidFailToReceiveAdWithError={(e) => console.log(e)}
+                    servePersonalizedAds={false}
+                    // style={{padding: 20}}
+                    />
+                </View>
                 <View style={style.titleContainer}>
                         <TouchableOpacity 
                         style={[style.titleBlock, {backgroundColor : active == 0? theme.colors.SECONDARY: "white", borderWidth: 1, borderColor: theme.colors.ACCENT},{borderTopLeftRadius: 14, borderBottomLeftRadius: 14}]}
@@ -395,18 +423,20 @@ function GoalScreen() {
                     }}>
                         {/* <View style={{justifyContent: "center", alignItems:"center", alignContent: "center"}} > */}
                           <View  style={{display:"flex", alignItems: "center", flex: 1}}>
-                            <View style={{flex: 0.2}}>
-                              <Text style={style.goalHeaderText} >Daily Goal {dailyGoalTemp ? dailyGoalTemp + " mins" :  "mins"}</Text>
-                            </View>
+                            <Animated.View style={{flex: 0.2, opacity: fadeIn}}>
+                              <Text style={style.goalHeaderText} >Daily Goal {dailyGoalTemp ? dailyGoalTemp + " mins" :  "not set"}</Text>
+                            </Animated.View>
                             <View style={{flexDirection:"row", flex: 0.4, justifyContent:"center", alignItems:"center"}}>
                               <View style={{width: Dimensions.get('window').width / 2, justifyContent:"center"}}>
                                 <Progress.Circle progress={dailyProgressPercent} formatText={() => todaysPracticeMins + " mins"} showsText={true} size={Dimensions.get('window').width / 2}  borderWidth={3} borderColor={theme.colors.ACCENT} color={theme.colors.TEXT} thickness={15}/>
                               </View>
                             </View>
                             <View style={{flex: 0.2, justifyContent:"flex-end"}}>
+                            <Animated.View style={{transform: [{translateY: fromBottom}], width:"100%"}}>
                               <TouchableOpacity onPress={() => setDailyModal(true)} style={style.chooseGoalButton}>
-                                <Text style={style.buttonText}>Chose Your Practice Goal</Text>
+                                <Text style={style.buttonText}>Choose Your Practice Goal</Text>
                               </TouchableOpacity>
+                              </Animated.View>
                             </View>
                               <View style={{flex: 0.2, justifyContent:"flex-start"}} >
                                 <Modal
@@ -443,7 +473,7 @@ function GoalScreen() {
                                       </View>
                                     </TouchableOpacity>
                                   </Modal>
-                                  <Modal 
+                                  {/* <Modal 
                                     animationType="slide"
                                     transparent={true}
                                     visible={notificationModal}
@@ -475,7 +505,7 @@ function GoalScreen() {
                                       </TouchableOpacity>
                                   </View>
                                   </TouchableOpacity>
-                                  </Modal>
+                                  </Modal> */}
                                   {/* <Button 
                                   title="Schedule Practice Time"
                                   onPress={() =>setNotificationModal(true)}
@@ -495,9 +525,9 @@ function GoalScreen() {
                               </View>
                             </View>
                         <View style={{flex:0.2, justifyContent:"flex-end"}}>
-                              <TouchableOpacity onPress={() => setWeeklyModal(true)} style={style.chooseGoalButton}>
-                                <Text style={style.buttonText}>Chose Your Practice Goal</Text>
-                              </TouchableOpacity>
+                                <TouchableOpacity onPress={() => setWeeklyModal(true)} style={style.chooseGoalButton}>
+                                  <Text style={style.buttonText}>Choose Your Practice Goal</Text>
+                                </TouchableOpacity>
                             </View>
                               <View >
                                 <Modal
@@ -547,7 +577,7 @@ function GoalScreen() {
                         alignItems: 'center'
                     }}>
                         <View style={{flex: 0.2}}>
-                            <Text style={style.goalHeaderText} >Monthly Goal {monthlyGoalTemp ? monthlyGoalTemp + " hrs" :  " not set"}</Text>
+                            <Text style={style.goalHeaderText} >Monthly Goal {monthlyGoalTemp ? monthlyGoalTemp + " hrs" :  "not set"}</Text>
                         </View>
                         <View style={{flexDirection:"row", flex: 0.4}}>
                               <View style={{width: Dimensions.get('window').width / 2, justifyContent:"center"}}>
@@ -556,7 +586,7 @@ function GoalScreen() {
                           </View>
                         <View style={{flex: 0.2, justifyContent:"flex-end"}}>
                               <TouchableOpacity onPress={() => setMonthlyModal(true)} style={style.chooseGoalButton}>
-                                <Text style={style.buttonText} >Chose Your Practice Goal</Text>
+                                <Text style={style.buttonText} >Choose Your Practice Goal</Text>
                               </TouchableOpacity>
                             </View>
                               <View >
@@ -659,7 +689,8 @@ const styles = theme => StyleSheet.create( {
       color: theme.colors.TEXT_SECONDARY,
       textAlign:"center",
       // fontSize:16 
-      fontSize: theme.typography.size.S
+      fontSize: theme.typography.size.S,
+      fontWeight: "bold"
     },
     goalHeaderText: {
       fontSize: theme.typography.size.M,

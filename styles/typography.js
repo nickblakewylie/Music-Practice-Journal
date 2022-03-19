@@ -18,6 +18,7 @@ export function normalize(size) {
 }
 
 const size = {
+    XXXS: normalize(4),
     XXS: normalize(10),
     XS: normalize(14),
     S: normalize(16),

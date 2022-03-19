@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useContext} from 'react'
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Dimensions, Button, Platform} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Dimensions, Button, Platform, Animated, Easing} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Video } from 'expo-av';
 import {PracticeSessions} from '../PracticeSessions'
@@ -13,13 +13,14 @@ import Header from '../components/Header';
 import useTheme from '../myThemes/useTheme';
 import useThemedStyles from '../myThemes/useThemedStyles';
 
-// import {
-//     AdMobBanner,
-//     AdMobInterstitial,
-//     PublisherBanner,
-//     AdMobRewarded,
-//     setTestDeviceIDAsync,
-//   } from 'expo-ads-admob';
+
+import {
+    AdMobBanner,
+    AdMobInterstitial,
+    PublisherBanner,
+    AdMobRewarded,
+    setTestDeviceIDAsync,
+  } from 'expo-ads-admob';
 
 const Stack = createNativeStackNavigator();
 const Home = () => {
@@ -56,6 +57,15 @@ const MainPage = ({navigation, route})  => {
     // weekMonthYear 0 = week, 1 = month, 2 = year
     const [weekMonthYear, setWeekMonthYear] = useState(0)
     const [updated, setUpdated] = useState(0)
+
+    // animation values
+    const slideIn = useRef(new Animated.Value(0)).current
+    const slideUp = useRef(new Animated.Value(Dimensions.get('window').width / 2)).current
+    const wave1 = useRef(new Animated.Value(Dimensions.get('window').width / 2)).current
+    const wave2 = useRef(new Animated.Value(Dimensions.get('window').width / 2)).current
+    const wave3 = useRef(new Animated.Value(Dimensions.get('window').width / 2)).current
+    const wave4 = useRef(new Animated.Value(Dimensions.get('window').width / 2)).current
+
     function makeDateLookNice(date){
         var myDate = new Date(date)
         const nicelookingDate = months[myDate.getMonth()] + " " + myDate.getDate() + ", " + myDate.getFullYear() 
@@ -95,17 +105,20 @@ const MainPage = ({navigation, route})  => {
             var weekDays = getDayNumbersPastWeek()
             if(weekMonthYear == 0){
                 var week  = practiceSessions.filter(el => checkIfDateInWeekArray(el.date, weekDays) == true)
-                setThisMonthsSessions(week)
+                sortPracticeSessionsByDate(week);
+                // setThisMonthsSessions(week)
             }
             else if(weekMonthYear == 1){
                 // show Month
                 var t = practiceSessions.filter(el => (months[new Date(el.date).getMonth()] == currentMonth && new Date(el.date).getFullYear() == new Date().getFullYear()))
+                sortPracticeSessionsByDate(t);
                 setThisMonthsSessions(t)
             }
             // show Year
             else{
                 var temp = practiceSessions.filter(el => new Date(el.date).getFullYear() == new Date().getFullYear())
-                setThisMonthsSessions(temp)
+                sortPracticeSessionsByDate(temp);
+                // setThisMonthsSessions(temp)
             }
         }
         else{
@@ -159,6 +172,52 @@ const MainPage = ({navigation, route})  => {
     //     getThisMonthsPracticeSessions()
     //     console.log("called")
     // }, [updated != null])
+    function onStartAnimations(){
+        Animated.parallel([
+        Animated.timing(slideIn,{
+            toValue: 1,
+            duration: 1500,
+            useNativeDriver: true
+        }),
+        Animated.stagger(200, [
+            Animated.timing(wave1,{
+                toValue: 0,
+                duration: 900,
+                useNativeDriver: true
+            }),
+            Animated.timing(wave2,{
+                toValue: 0,
+                duration: 900,
+                useNativeDriver: true
+            }),
+            Animated.timing(wave3,{
+                toValue: 0,
+                duration: 900,
+                useNativeDriver: true
+            }),
+            Animated.timing(wave4, {
+                toValue : 0,
+                duration: 900,
+                useNativeDriver: true
+            }
+            )
+        ])]).start()
+    }
+    function slideUpAnimation(){
+        Animated.timing(slideUp,{
+            toValue: 0,
+            duration: 1200,
+            useNativeDriver: true
+        }).start()
+    }
+    function sortPracticeSessionsByDate(sessions){
+        var newA = sessions
+        newA.sort(function(a, b){
+            return new Date(b.date) - new Date(a.date);
+        })
+        setThisMonthsSessions(newA)
+    }
+
     useEffect(() => {
         updatePracticeSessionStorage()
         getThisMonthsPracticeSessions()
@@ -179,6 +238,7 @@ const MainPage = ({navigation, route})  => {
         // console.log("loaded")
         getThisMonthsPracticeSessions()
         // setTestDeviceIDAsync('EMULATOR');
+        onStartAnimations()
     }, [])
     function getDaysInMonth(month, year){
         return new Date(year, month, 0).getDate();
@@ -219,7 +279,7 @@ const MainPage = ({navigation, route})  => {
             const tempPT = findPracticeSessionForDay(i, month, year);
             sum += tempPT
         }
-        return sum
+        return sum 
     }
     function getDayOfPractice(date){
         var tempD = new Date(date)
@@ -241,6 +301,16 @@ const MainPage = ({navigation, route})  => {
                 tempData.push({x : weekday[theCurrentDate.subtractDays(2).getDay()], y: findPracticeSessionForDay(theCurrentDate.subtractDays(2).getDate(),theCurrentDate.subtractDays(2).getMonth(), theCurrentDate.subtractDays(2).getFullYear()), label: findPracticeSessionForDay(theCurrentDate.subtractDays(2).getDate(),theCurrentDate.subtractDays(2).getMonth(), theCurrentDate.subtractDays(2).getFullYear()).toString()})
                 tempData.push({x : weekday[theCurrentDate.subtractDays(1).getDay()], y: findPracticeSessionForDay(theCurrentDate.subtractDays(1).getDate(),theCurrentDate.subtractDays(1).getMonth(), theCurrentDate.subtractDays(1).getFullYear()), label: findPracticeSessionForDay(theCurrentDate.subtractDays(1).getDate(),theCurrentDate.subtractDays(1).getMonth(), theCurrentDate.subtractDays(1).getFullYear()).toString()})
                 tempData.push({x : weekday[theCurrentDate.getDay()],y: findPracticeSessionForDay(theCurrentDate.getDate(),theCurrentDate.getMonth(), theCurrentDate.getFullYear()), label : findPracticeSessionForDay(theCurrentDate.getDate(),theCurrentDate.getMonth(), theCurrentDate.getFullYear()).toString()})
+                var notEmpty = 0
+                for(var p = 0; p < tempData.length; p++){
+                    if(tempData[p].y != 0){
+                        notEmpty ++;
+                        break
+                    }
+                }
+                if(notEmpty == 0){
+                    tempData = null
+                }
             }else if(weekMonthYear == 1){
                 for(var i = 1; i < daysInMonth; i++){
                     const y = findPracticeSessionForDay(i,months.indexOf(currentMonth), year)
@@ -269,11 +339,11 @@ const MainPage = ({navigation, route})  => {
             style: {
                 tickLabels: {
                     fill: theme.colors.TEXT,
-                    padding: 5,
+                    padding: 14,
                 },
                 axisLabel: {
                     fill: theme.colors.TEXT,
-                    padding: 36
+                    padding: 37
                 },
                 grid: {
                     stroke: "transparent",
@@ -288,17 +358,18 @@ const MainPage = ({navigation, route})  => {
     }
     // if(practiceSessions != null){
         return(
-            <ScrollView style={{backgroundColor: theme.colors.BACKGROUND}} contentContainerStyle={{paddingBottom: 80}} automaticallyAdjustContentInsets={false}>
-                {/* <View style={{flex: 1, justifyContent:"center", alignItems:"center"}}>
+            <Animated.ScrollView style={{backgroundColor: theme.colors.BACKGROUND}} contentContainerStyle={{paddingBottom: 80}} automaticallyAdjustContentInsets={false}>
+                <View style={{width:"100%",alignItems:"center", top: 0}}>
                     <AdMobBanner
                     bannerSize="banner"
                     adUnitID="ca-app-pub-5263616863180217/9832651621"
                     onDidFailToReceiveAdWithError={(e) => console.log(e)}
-                    servePersonalizedAds={true}
+                    servePersonalizedAds={false}
                     // style={{padding: 20}}
                     />
-                </View> */}
-                <View style={{width:"90%", flexDirection: "row",alignSelf:"center"}}>
+                </View>
+                <Animated.View >
+                <Animated.View style={{width:"90%", flexDirection: "row",alignSelf:"center", opacity:slideIn, transform:[{translateY: wave1}]}}>
                             <TouchableOpacity 
                                 onPress={() => {setWeekMonthYear(0)}}
                                 style={[style.statBubble, weekMonthYear == 0? style.acticeColor : "", {marginRight: 5}]}
@@ -317,8 +388,8 @@ const MainPage = ({navigation, route})  => {
                             >
                                 <Text style={[weekMonthYear == 2? {color: theme.colors.TEXT_SECONDARY} : style.statTextColor, style.statFont]}>This Year</Text>
                             </TouchableOpacity>
-                </View>
-                <View style={{width:"90%",alignSelf:"center", flexDirection: "row", marginTop: 0, alignItems:"center", marginBottom: 5}}>
+                </Animated.View>
+                <Animated.View style={{width:"90%",alignSelf:"center", flexDirection: "row", marginTop: 0, alignItems:"center", marginBottom: 5, opacity:slideIn, transform:[{translateY: wave2}]}}>
                     <View style={[style.statBubble, {marginRight: 5}]}>
                             <View style={style.statBubbleTop}>
                                 <Ionicons name="time" size={theme.typography.size.L} color="white"  /><Text style={[style.statBubbleHeader, style.statTextColor]}>Time Practiced</Text>
@@ -335,58 +406,62 @@ const MainPage = ({navigation, route})  => {
                             <Text style={[{fontSize: theme.typography.size.SM, marginLeft: 5}, style.statTextColor]} >{Math.round((averageQuality + Number.EPSILON) * 100) / 100}</Text>
                         </View>
                     </View>
-                </View>
-                <View style={{ width: "90%",backgroundColor: theme.colors.SECONDARY,borderRadius: 10, padding: 10, alignSelf:"center"}}>
-                <View style={{ flexDirection: "row", justifyContent:"center",alignItems:"center",alignSelf:"center"}}>
-                    {
-                        chartData !=null && chartData.length > 0  && thisMonthsSessions != null? 
-                    
-                    <View style={{alignItems:"center", width:"100%", flexDirection:"column"}}>
-                        <View style={{width:"100%", alignItems:"center"}}>
-                            <Text style={[style.chartTitle,style.statTextColor, {textAlign:"left"}]} >My Practice Sessions</Text>
+                </Animated.View>
+                <Animated.View style={{opacity:slideIn, transform:[{translateY: wave3}]}} >
+                    <View style={{ width: "90%",backgroundColor: theme.colors.SECONDARY,borderRadius: 10, borderWidth: 2, padding: 10, alignSelf:"center"}}>
+                        <View style={{ flexDirection: "row", justifyContent:"center",alignItems:"center",alignSelf:"center"}}>
+                            {
+                                chartData !=null && chartData.length > 0  && thisMonthsSessions != null? 
+                            <View style={{alignItems:"center", width:"100%", flexDirection:"column"}}>
+                                <View style={{width:"100%", alignItems:"center"}}>
+                                    <Text style={[style.chartTitle,style.statTextColor, {textAlign:"left"}]} >My Practice Sessions</Text>
+                                </View>
+                                <View style={{alignSelf:"center", width: "100%", alignItems:"right", alignContent:"center"}}>
+                                <VictoryChart
+                                width={Dimensions.get('window').width * 0.85}
+                                height={Dimensions.get('window').height / 3.7}
+                                // data={chartData}
+                                theme={chartTheme}
+                                >
+                                <VictoryAxis dependentAxis={true} label={weekMonthYear != 2 ? "Time (mins)": "Time (hrs)"} />
+                                { weekMonthYear == 1?
+                                <VictoryAxis label={currentMonth}  /> : <VictoryAxis /> 
+                                }
+                                <VictoryBar
+                                    data={chartData}
+                                    style={{data: {stroke: theme.colors.TEXT,fill: "#5F7CA6"},labels:{
+                                        fontSize: theme.typography.size.SM, fill:"black"}}}
+                                    // labels={datum => datum.toString()}
+                                    labelComponent={<VictoryTooltip renderInPortal={false} style={{fontSize: theme.typography.size.SM, padding: 3}}/>}
+                                    // animate={{
+                                    //     duration: 200,
+                                    //     onLoad: {duration: 2000}
+                                    // }}
+                                    // style={{
+                                    //     data: {fill: "tomato", width: 20}
+                                    //   }}
+                                />
+                                </VictoryChart>
+                                </View>
+                            </View>: 
+                            <View style={{width: Dimensions.get('window').width * 0.85, height: Dimensions.get('window').height / 3.7, justifyContent:"center"}}>
+                                <View style={{width: theme.typography.size.SM * 8, height: theme.typography.size.SM * 8,alignSelf: "center",backgroundColor:theme.colors.TEXT_SECONDARY, borderRadius: 1000000,justifyContent:"center"}}>
+                                    <View style={{transform: [{rotate: "45deg"}], width:"100%", borderBottomWidth: theme.typography.size.XXXS, borderColor:theme.colors.THIRD}}></View>
+                                    <Text style={[style.statText, style.practiceSessionHeaderText, {position:"absolute", textAlign:"center", alignSelf:"center"}]}>No Data</Text>
+                                </View>
+                            </View>
+                            }
                         </View>
-                        <View style={{alignSelf:"center", width: "100%", alignItems:"right", alignContent:"center"}}>
-                        <VictoryChart
-                        width={Dimensions.get('window').width * 0.85}
-                        height={Dimensions.get('window').height / 3.7}
-                        // data={chartData}
-                        theme={chartTheme}
-                        >
-                        <VictoryAxis dependentAxis={true} label={weekMonthYear != 2 ? "Time (mins)": "Time (hrs)"} />
-                        { weekMonthYear == 1?
-                        <VictoryAxis label={currentMonth}  /> : <VictoryAxis /> 
-                        }
-                        <VictoryBar
-                            data={chartData}
-                            style={{data: {stroke: theme.colors.TEXT,fill: "#5F7CA6"},labels:{
-                                fontSize: theme.typography.size.SM, fill:"black"}}}
-                            // labels={datum => datum.toString()}
-                            labelComponent={<VictoryTooltip renderInPortal={false} style={{fontSize: theme.typography.size.SM, padding: 3}}/>}
-                            animate={{
-                                duration: 200,
-                                onLoad: {duration: 1000}
-                            }}
-                            // style={{
-                            //     data: {fill: "tomato", width: 20}
-                            //   }}
-                        />
-                        </VictoryChart>
-                        </View>
-                    </View>: 
-                    <View>
-                        <Text style={[style.statText, style.practiceSessionHeaderText, {textAlign: "center"}]}>No Data</Text>
                     </View>
-
-                    }
-                    </View>
-                </View>
                 { thisMonthsSessions != null ?
                 <View style={style.practiceSessionHeader}> 
                     <Text style={[style.statText, style.practiceSessionHeaderText]}>Practice Session</Text>
                 </View>: <View>
-
                 </View>
                 }
+                
+                 </Animated.View>
+                <Animated.View style={{opacity:slideIn, transform:[{translateY: wave4}]}}>
                 {
                     thisMonthsSessions?
                     thisMonthsSessions.map((data, index) => 
@@ -408,7 +483,9 @@ const MainPage = ({navigation, route})  => {
                     </View>
                     ): <View></View>
                 }
-            </ScrollView>
+                </Animated.View>
+                </Animated.View>
+            </Animated.ScrollView>
         )
     
 }
@@ -438,6 +515,7 @@ const styles = theme => StyleSheet.create({
         marginBottom: 10,
         // padding: 5,
         borderRadius: 10,
+        borderWidth: 2
         // height: 60
     },
     statsContainer:{
@@ -468,6 +546,7 @@ const styles = theme => StyleSheet.create({
         marginTop: 10,
         padding: 10,
         borderRadius: 10,
+        borderWidth: 2
         // shadowColor:theme.colors.TEXT,
         // shadowOffset: {
         //     width: 2,

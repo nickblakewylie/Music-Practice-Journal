@@ -2,7 +2,7 @@
   "expo": {
     "name": "MusicJournal",
     "slug": "MusicJournal",
-    "version": "2.0.9",
+    "version": "2.1.3",
     "orientation": "portrait",
     "icon": "./assets/music_icon.png",
     "notification" : {
@@ -36,6 +36,9 @@
       "infoPlist":{
         "NSCameraUsageDescription": "This app needs camera access to take videos during your practice sessions",
         "NSMicrophoneUsageDescription": "This app needs microphone access to record the audio during your practice sessions"
+      },
+      "config": {
+        "googleMobileAdsAppId": "ca-app-pub-5263616863180217~4145689603"
       }
     },
     "android": {

@@ -14,6 +14,7 @@ import SongList from '../components/SongList';
 
 import useDeepCompareEffect from 'use-deep-compare-effect'
 import { UpdatePState } from '../UpdatePState';
+import { AdMobBanner } from 'expo-ads-admob';
 function SetListScreen({navigation}) {
     const theme = useTheme();
     const style = useThemedStyles(styles);
@@ -44,20 +45,26 @@ function SetListScreen({navigation}) {
         return false
     }
     async function addSong(){
-        if(songName != null &&  songDifficulty != null && Number(songDifficulty) > 0 && Number(songDifficulty) < 11){
-            if(checkIfSongIsAlreadyAdded(songName) == false ){
-                var tempT = setLists
-                if(setLists != null && setLists.length > 0){
-                    tempT.push({'songName': songName, 'songDifficulty' : songDifficulty, 'pTime': 0})
+        if(songName != null &&  songDifficulty != null && songName.length > 0){
+            if(Number(songDifficulty) > 0 && Number(songDifficulty) < 11){
+                if(checkIfSongIsAlreadyAdded(songName) == false ){
+                    var tempT = setLists
+                    if(setLists != null && setLists.length > 0){
+                        tempT.push({'songName': songName, 'songDifficulty' : songDifficulty, 'pTime': 0})
+                    }else{
+                        tempT = [{'songName': songName, 'songDifficulty' : songDifficulty, 'pTime': 0}]
+                    }
+                    setMySetLists(tempT)
+                    setAddSetListModal(false)
+                    setSongName(null)
+                    setSongDifficulty(null)
                 }else{
-                    tempT = [{'songName': songName, 'songDifficulty' : songDifficulty, 'pTime': 0}]
+                    Alert.alert("Song is already added", "", [{
+                        text: "OK"
+                    }])
                 }
-                setMySetLists(tempT)
-                setAddSetListModal(false)
-                setSongName(null)
-                setSongDifficulty(null)
             }else{
-                Alert.alert("Song is already added", "", [{
+                Alert.alert("Enter a difficulty 1 - 10", "", [{
                     text: "OK"
                 }])
             }
@@ -144,42 +151,23 @@ function SetListScreen({navigation}) {
     useEffect(async() => {
         await storeCurrentSetList()
         calculateThePracticeTimes()
-        // console.log("set list has been updated")
     }, [JSON.stringify(setLists)])
-    // useEffect(() => {
-    //     calculateThePracticeTimes()
-    //     console.log("set list has been updated")
-    // }, [JSON.stringify(setLists)])
-    // useEffect(() =>{
-    //     calculateThePracticeTimes()
-    //     console.log("practice sessions changed")
-    // }, [JSON.stringify(practiceSessions)])
     useEffect(() => {
         calculateThePracticeTimes()
-        console.log("practice session has been called")
     },[JSON.stringify(practiceSessions)])
-    // useEffect(() => {
-    //     calculateThePracticeTimes()
-    //     console.log("update p times");
-    // }, [updatePState])
-    // useEffect(async() =>{
-    //     calculateThePracticeTimes()
-    // }, [practiceSessions])
-    // useFocusEffect(
-    //     useCallback(
-    //         () => {
-    //             calculateThePracticeTimes()
-    //             return() =>{
-    //                 console.log("screen unfocused")
-    //             }
-    //         },[]
-    //     )
-    // );
     useEffect(() => {
 
     }, [setLists])
     return (
         <View style={style.container}>
+            <View style={{width:"100%",alignItems:"center", top: 0}}>
+                <AdMobBanner
+                    bannerSize="banner"
+                    adUnitID="ca-app-pub-5263616863180217/9832651621"
+                    onDidFailToReceiveAdWithError={(e) => console.log(e)}
+                    servePersonalizedAds={false}
+                />
+            </View>
             <ScrollView contentContainerStyle={{paddingBottom: 150}}>
                 <View style={style.myHeader}>
                     <Text style={[style.setListText, {color: theme.colors.TEXT}]}>Your Songs</Text>
@@ -191,15 +179,6 @@ function SetListScreen({navigation}) {
                         </TouchableOpacity>
                         ):
                         <View></View>
-                    // <FlatList
-                    // data={newSetList}
-                    // renderItem={({item}) => (
-                    //     <TouchableOpacity onPress={() => editOrDelete(item.songName)} >
-                    //         <SetListItem  name={item.songName} difficulty={item.songDifficulty} pTime={item.pTime} />
-                    //     </TouchableOpacity>
-                    // )}
-                    // keyExtractor={(item) => item.songName}
-                    // />: <View></View>
                 }
                 <Modal
                     visible={changeDifficultyModal}
