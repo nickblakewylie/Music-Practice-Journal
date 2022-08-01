@@ -2,17 +2,11 @@ import React, { useState, useContext, useEffect, useCallback } from 'react'
 import {View, StyleSheet, FlatList, Text, ScrollView, TouchableOpacity, Button, Pressable, Modal, Dimensions, TextInput, Alert, ActionSheetIOS} from 'react-native'
 import useTheme from '../myThemes/useTheme';
 import useThemedStyles from '../myThemes/useThemedStyles';
-import { Entypo } from '@expo/vector-icons'; 
 import { Ionicons } from '@expo/vector-icons';
 import SetListItem from '../components/SetListItem';
 import {SetLists} from '../SetLists';
 import {PracticeSessions} from '../PracticeSessions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-import { useIsFocused, useFocusEffect } from '@react-navigation/native';
-import SongList from '../components/SongList';
-
-import useDeepCompareEffect from 'use-deep-compare-effect'
 import { UpdatePState } from '../UpdatePState';
 import { AdMobBanner } from 'expo-ads-admob';
 function SetListScreen({navigation}) {
@@ -31,9 +25,6 @@ function SetListScreen({navigation}) {
     const [newSetList, setNewSetList] = useState(null)
 
     const [currentSong, setCurrentSong] = useState(null)
-    // const tempF = useIsFocused()
-    // const [isFocused, setIsFocused] = useState(tempF)
-    // returns true is song is already in setList array
     function checkIfSongIsAlreadyAdded(newSongName){
         if(setLists != null){
             for(var i = 0; i < setLists.length; i ++){
@@ -117,7 +108,6 @@ function SetListScreen({navigation}) {
       },
       buttonIndex => {
         if (buttonIndex === 0) {
-          // cancel action
         } else if (buttonIndex === 2) {
           deleteSong(songName)
         } else if (buttonIndex === 1) {
@@ -127,7 +117,6 @@ function SetListScreen({navigation}) {
       }
     );
     function calculateThePracticeTimes(){
-        // console.log("calculate the practice time")
         var newSetList = setLists
         if(setLists != null && practiceSessions != null){
             for(var i =0; i < newSetList.length; i ++){
@@ -143,7 +132,6 @@ function SetListScreen({navigation}) {
                 newSetList[i].pTime = time
             }
             setTimesCalled(timesCalled + 1)
-            // setMySetLists(null)
             setMySetLists(newSetList)
             setNewSetList(newSetList)
         }
@@ -163,7 +151,7 @@ function SetListScreen({navigation}) {
             <View style={{width:"100%",alignItems:"center", top: 0}}>
                 <AdMobBanner
                     bannerSize="banner"
-                    adUnitID="ca-app-pub-5263616863180217/9832651621"
+                    adUnitID={process.env.GOOGLE_ADS_IDENTIFER}
                     onDidFailToReceiveAdWithError={(e) => console.log(e)}
                     servePersonalizedAds={false}
                 />

@@ -7,9 +7,6 @@ import { Ionicons} from '@expo/vector-icons';
 function SetListItem({name, difficulty, pTime}) {
     const theme = useTheme();
     const style = useThemedStyles(styles);
-    // function deleteThisSong(){
-    //     console.log("What's up")
-    // }
     return (
         <View style={style.setListContainer} >
             <View style={{flex: 0.5}}>

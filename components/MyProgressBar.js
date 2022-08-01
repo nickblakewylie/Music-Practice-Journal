@@ -2,7 +2,6 @@ import React from 'react'
 import { View, StyleSheet } from 'react-native'
 import useTheme from '../myThemes/useTheme';
 import useThemedStyles from '../myThemes/useThemedStyles';
-// import { colors } from '../styles/colors';
 
 // progress percent should be a decimal percent
 function MyProgressBar({progressPercent}) {

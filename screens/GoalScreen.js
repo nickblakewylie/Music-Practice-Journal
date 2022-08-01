@@ -1,16 +1,11 @@
-import Constants from 'expo-constants';
 import * as Notifications from 'expo-notifications';
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { Text, View, Button, Platform, StyleSheet, ScrollView, Dimensions, TouchableOpacity, TextInput, Modal, TouchableWithoutFeedback , Alert, Animated} from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import useTheme from '../myThemes/useTheme';
 import useThemedStyles from '../myThemes/useThemedStyles';
-import MyProgressBar from '../components/MyProgressBar';
 import { PracticeSessions } from '../PracticeSessions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
 import * as Progress from 'react-native-progress';
-import { useFocusEffect } from '@react-navigation/native';
 import { AdMobBanner } from 'expo-ads-admob';
 
 Notifications.setNotificationHandler({
@@ -23,12 +18,6 @@ Notifications.setNotificationHandler({
 
 function GoalScreen() {
     const {practiceSessions, setPracticeSessions} = useContext(PracticeSessions)
-    const [expoPushToken, setExpoPushToken] = useState('');
-    const [notification, setNotification] = useState(false);
-    const notificationListener = useRef();
-    const responseListener = useRef();
-    const [mode, setMode] = useState('time');
-    const [show, setShow] = useState(false);
     const [scheduleTime, setScheduleTime] = useState(new Date());
     const theme = useTheme();
     const style = useThemedStyles(styles);
@@ -56,49 +45,16 @@ function GoalScreen() {
     // animation
     const fadeIn = useRef(new Animated.Value(0)).current
     const fromBottom = useRef(new Animated.Value(Dimensions.get('window').height/ 2)).current
+    
+  
+    function changeGoal(page){
 
-    // useEffect(() => {
-    //     registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
-    
-    //     notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-    //       setNotification(notification);
-    //     });
-    
-    //     responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-    //       console.log(response);
-    //     });
-    
-    //     return () => {
-    //       Notifications.removeNotificationSubscription(notificationListener.current);
-    //       Notifications.removeNotificationSubscription(responseListener.current);
-    //     };
-    //   }, []);  
-      const onChange = (event, selectedDate) => {
-        const currentDate = selectedDate || date;
-        setShow(Platform.OS === 'ios');
-        setScheduleTime(currentDate);
-      };
-    
-      const showMode = (currentMode) => {
-        setShow(true);
-        setMode(currentMode);
-      };
-    
-      const showTimepicker = () => {
-        showMode('time');
-      };
-      function changeGoal(page){
-
-        scrollRef.current?.scrollTo({
-            y : 0,
-            x: Dimensions.get('window').width * page,
-            animated: false
-        });
-      }
-    const handleScroll = (event) => {
-        const positionX = event.nativeEvent.contentOffset.x;
-        const positionY = event.nativeEvent.contentOffset.y;
-    };
+      scrollRef.current?.scrollTo({
+          y : 0,
+          x: Dimensions.get('window').width * page,
+          animated: false
+      });
+    }
     function getDayNumbersPastWeek(){
       var date = new Date()
       return [date.subtractDays(6),date.subtractDays(5),date.subtractDays(4),date.subtractDays(3),date.subtractDays(2),date.subtractDays(1), date]
@@ -313,36 +269,6 @@ function GoalScreen() {
       });
       setNotificationModal(false)
     }
-  
-  async function registerForPushNotificationsAsync() {
-      let token;
-      if (Constants.isDevice) {
-        const { status: existingStatus } = await Notifications.getPermissionsAsync();
-        let finalStatus = existingStatus;
-        if (existingStatus !== 'granted') {
-          const { status } = await Notifications.requestPermissionsAsync();
-          finalStatus = status;
-        }
-        if (finalStatus !== 'granted') {
-          alert('Failed to get push token for push notification!');
-          return;
-        }
-        token = (await Notifications.getExpoPushTokenAsync()).data;
-      } else {
-        alert('Must use physical device for Push Notifications');
-      }
-    
-      if (Platform.OS === 'andriod') {
-        Notifications.setNotificationChannelAsync('default', {
-          name: 'default',
-          importance: Notifications.AndroidImportance.MAX,
-          vibrationPattern: [0, 250, 250, 250],
-          lightColor: '#FF231F7C',
-        });
-      }
-    
-      return token;
-    }
     useEffect(() => {
       getThisWeeksPracticeMins()
       getTodaysPracticeMins()
@@ -376,10 +302,9 @@ function GoalScreen() {
                 <View style={{width:"100%",alignItems:"center", top: 0}}>
                     <AdMobBanner
                     bannerSize="banner"
-                    adUnitID="ca-app-pub-5263616863180217/9832651621"
+                    adUnitID={process.env.GOOGLE_ADS_IDENTIFER}
                     onDidFailToReceiveAdWithError={(e) => console.log(e)}
                     servePersonalizedAds={false}
-                    // style={{padding: 20}}
                     />
                 </View>
                 <View style={style.titleContainer}>
@@ -400,10 +325,7 @@ function GoalScreen() {
                         </TouchableOpacity>
               </View>
             <ScrollView ref={scrollRef} horizontal={true} decelerationRate={0} snapToAlignment={"center"} snapToInterval={Dimensions.get('window').width} onScroll={event => { 
-              // scroll animation ended
               const xA  = event.nativeEvent.contentOffset.x;
-              // console.log("window width ");
-              // console.log(xA);
               if(xA < Dimensions.get('window').width / 1.3){
                 setActive(0);
               }else if(xA >= Dimensions.get('window').width / 1.3 && xA < Dimensions.get('window').width *2 / 1.3){
@@ -421,7 +343,6 @@ function GoalScreen() {
                         flex: 1,
                         alignItems: 'center'
                     }}>
-                        {/* <View style={{justifyContent: "center", alignItems:"center", alignContent: "center"}} > */}
                           <View  style={{display:"flex", alignItems: "center", flex: 1}}>
                             <Animated.View style={{flex: 0.2, opacity: fadeIn}}>
                               <Text style={style.goalHeaderText} >Daily Goal {dailyGoalTemp ? dailyGoalTemp + " mins" :  "not set"}</Text>
@@ -473,43 +394,6 @@ function GoalScreen() {
                                       </View>
                                     </TouchableOpacity>
                                   </Modal>
-                                  {/* <Modal 
-                                    animationType="slide"
-                                    transparent={true}
-                                    visible={notificationModal}
-                                    onRequestClose={() =>
-                                      setNotificationModal(false)
-                                    }  
-                                  >
-                                  <TouchableOpacity
-                                    activeOpacity={1} 
-                                    onPressOut={() => {setNotificationModal(false)}}
-                                    style={style.modalContainer}
-                                  >
-                                  <View style={style.modalInnerContainer}>
-                                      <TouchableOpacity onPress={() => setNotificationModal(false)} style={{width: "100%", alignItems:"flex-end"}}>
-                                          <Text style={{color: theme.colors.BACKGROUND, fontSize: 20}}>X</Text>
-                                        </TouchableOpacity>
-                                      <DateTimePicker
-                                      testID="dateTimePicker"
-                                      value={scheduleTime}
-                                      mode={mode}
-                                      is24Hour={true}
-                                      display="inline"
-                                      onChange={onChange}
-                                      themeVariant="light"
-                                      // style={{width: 80, height: 100, display: "flex"}}
-                                      />
-                                      <TouchableOpacity onPress={() =>schedulePushNotification()} style={{backgroundColor: theme.colors.ACCENT, borderRadius:15, padding: 10}} >
-                                        <Text style={style.buttonText}>Schedule Notification</Text>
-                                      </TouchableOpacity>
-                                  </View>
-                                  </TouchableOpacity>
-                                  </Modal> */}
-                                  {/* <Button 
-                                  title="Schedule Practice Time"
-                                  onPress={() =>setNotificationModal(true)}
-                                  /> */}
                             </View>
                             </View>
                         </View>

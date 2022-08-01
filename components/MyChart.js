@@ -1,5 +1,4 @@
 import React from 'react'
-import { View } from 'react-native'
 import { VictoryChart, VictoryLine, VictoryTheme } from 'victory-native'
 
 function MyChart({chartData}) {

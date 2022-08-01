@@ -1,26 +1,13 @@
 import React, { useState, useEffect, useRef, useContext} from 'react'
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Dimensions, Button, Platform, Animated, Easing} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Dimensions,  Animated} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Video } from 'expo-av';
 import {PracticeSessions} from '../PracticeSessions'
-import { Calendar } from 'react-native-calendars';
 import { Ionicons } from '@expo/vector-icons';
-import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import PracticeSession from '../components/PracticeSession';
-import { VictoryLine, VictoryChart, VictoryTheme, VictoryLabel, VictoryBar, VictoryAxis, VictoryGroup, VictoryArea, VictoryScatter, VictoryTooltip } from 'victory-native';
-import Header from '../components/Header';
+import {VictoryChart, VictoryBar, VictoryAxis, VictoryTooltip } from 'victory-native';
 import useTheme from '../myThemes/useTheme';
 import useThemedStyles from '../myThemes/useThemedStyles';
-
-
-import {
-    AdMobBanner,
-    AdMobInterstitial,
-    PublisherBanner,
-    AdMobRewarded,
-    setTestDeviceIDAsync,
-  } from 'expo-ads-admob';
+import { AdMobBanner } from 'expo-ads-admob';
 
 const Stack = createNativeStackNavigator();
 const Home = () => {
@@ -54,11 +41,8 @@ const MainPage = ({navigation, route})  => {
     const [averageQuality, setAverageQuality] = useState(null);
     const [thisMonthsSessions, setThisMonthsSessions] = useState(null)
     const [chartData, setChartData] = useState(null)
-    // weekMonthYear 0 = week, 1 = month, 2 = year
     const [weekMonthYear, setWeekMonthYear] = useState(0)
     const [updated, setUpdated] = useState(0)
-
-    // animation values
     const slideIn = useRef(new Animated.Value(0)).current
     const slideUp = useRef(new Animated.Value(Dimensions.get('window').width / 2)).current
     const wave1 = useRef(new Animated.Value(Dimensions.get('window').width / 2)).current
@@ -118,17 +102,12 @@ const MainPage = ({navigation, route})  => {
             else{
                 var temp = practiceSessions.filter(el => new Date(el.date).getFullYear() == new Date().getFullYear())
                 sortPracticeSessionsByDate(temp);
-                // setThisMonthsSessions(temp)
             }
         }
         else{
-            // console.log("practice Sessions deleted")
             setThisMonthsSessions(null)
         }
         setUpdated(Math.random() *1000);
-    }
-    function deleteFromArray(date){
-        deletePracticeSession(date)
     }
     async function updatePracticeSessionStorage(){
         await AsyncStorage.setItem('practiceSessions', JSON.stringify(practiceSessions));
@@ -237,9 +216,9 @@ const MainPage = ({navigation, route})  => {
     useEffect(() => {
         // console.log("loaded")
         getThisMonthsPracticeSessions()
-        // setTestDeviceIDAsync('EMULATOR');
         onStartAnimations()
     }, [])
+
     function getDaysInMonth(month, year){
         return new Date(year, month, 0).getDate();
     }
@@ -362,11 +341,10 @@ const MainPage = ({navigation, route})  => {
                 <View style={{width:"100%",alignItems:"center", top: 0}}>
                     <AdMobBanner
                     bannerSize="banner"
-                    adUnitID="ca-app-pub-5263616863180217/9832651621"
+                    adUnitID={process.env.GOOGLE_ADS_IDENTIFER}
                     onDidFailToReceiveAdWithError={(e) => console.log(e)}
-                    servePersonalizedAds={false}
-                    // style={{padding: 20}}
                     />
+
                 </View>
                 <Animated.View >
                 <Animated.View style={{width:"90%", flexDirection: "row",alignSelf:"center", opacity:slideIn, transform:[{translateY: wave1}]}}>

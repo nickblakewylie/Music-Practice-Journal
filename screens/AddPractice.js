@@ -2,10 +2,9 @@ import React, { useRef, useState, useEffect, useContext } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, Animated, Modal, Alert, Pressable, TextInput, Button, Dimensions, Keyboard, TouchableWithoutFeedback, Easing, TouchableHighlight, Vibration} from 'react-native'
 import { Ionicons } from '@expo/vector-icons';
 import { Camera } from 'expo-camera';
-import { Video, AVPlaybackStatus } from 'expo-av';
+import { Video } from 'expo-av';
 import * as FileSystem from 'expo-file-system';
 import uuid from 'react-native-uuid';
-import { RECORDING_OPTION_IOS_OUTPUT_FORMAT_ILBC } from 'expo-av/build/Audio';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {PracticeSessions} from '../PracticeSessions';
 import {SetLists} from '../SetLists'
@@ -19,31 +18,6 @@ function AddPractice() {
     const style = useThemedStyles(styles);
     const wavesAnim = useRef(new Animated.Value(0)).current
     const fadeOut = useRef(new Animated.Value(1)).current
-    const createWaves = () => {
-        // Animated.parallel([
-        // Animated.sequence([
-        //     Animated.timing(wavesAnim, {
-        //         toValue: Dimensions.get('window').height / 1.7,
-        //         easing: Easing.in(),
-        //         duration: 1000,
-        //         useNativeDriver:false
-        //     })
-        // ]
-        // ),
-        // Animated.timing(fadeOut, {
-        //     toValue: 0,
-        //     easing: Easing.in(),
-        //     duration: 1000,
-        //     useNativeDriver:false
-        // })
-        // ]).start(() => {
-        //     setModalVisible(true)
-        //     Animated.delay(100).start(() =>{
-        //         wavesAnim.setValue(0)
-        //         fadeOut.setValue(1)
-        //     })
-        // })
-    }
     const [modalVisible, setModalVisible] = useState(false);
     const [cameraVisible, setCameraVisible] = useState(false);
     const [practiceTime, setPracticeTime] = useState(null);
@@ -58,12 +32,9 @@ function AddPractice() {
     const [downloading, setDownloading] = useState(false);
     const [status, setStatus] = React.useState({});
     const [downloadedVid, setDownloadedVid] = useState(null)
-
     const [practiceSong, setPracticeSong] = useState(null);
-
     const {practiceSessions, setPracticeSessions} = useContext(PracticeSessions)
     const {setLists, setMySetList} = useContext(SetLists)
-
     const [dropDownOpen, setDropDownOpen] = useState(false)
     const [dropDownItems, setDropDownItems] = useState([
       ]);
@@ -88,15 +59,11 @@ function AddPractice() {
         }
     }
     useEffect(() => {
-        // createWaves()
         (async () => {
             setDownloading(false);
-          const { status } = await Camera.requestCameraPermissionsAsync();
-        //   const { microphone } = await Camera.requestMicrophonePermissionsAsync()
-          console.log(status)
-        //   console.log(microphone)
-          setHasPermission(status === 'granted');
-          createTheDropDownList()
+            const { status } = await Camera.requestCameraPermissionsAsync();
+            setHasPermission(status === 'granted');
+            createTheDropDownList()
         })();
       }, []);
       useEffect(() => {
@@ -205,9 +172,6 @@ function AddPractice() {
     }
     return (
         <View style={style.container}>
-            {/* <Animated.View 
-            style={{width: wavesAnim, borderRadius:10000,height: wavesAnim, backgroundColor: theme.colors.TEXT, opacity:1, position: "absolute", zIndex: 0}} >
-            </Animated.View> */}
             <Modal
             animationType="slide"
             transparent="true"
@@ -219,7 +183,6 @@ function AddPractice() {
             >
                 <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss()}}>
                 <View style={style.practiceContainer}>
-                    {/* <View style={{width: "90%", alignSelf:"center"}}> */}
                             <View style={{marginBottom:10, width:"90%", alignSelf:"center"}}>
                                 <Text style={style.practiceSessionTitle}>Practice Session</Text>
                             </View>
@@ -384,7 +347,7 @@ function AddPractice() {
                                             }
                                         }}
                                         style={style.button}>
-                                            <Text style={{fontSize: theme.typography.size.SM, color: theme.colors.TEXT}}>Back button</Text>
+                                            <Text style={{fontSize: theme.typography.size.SM, color: theme.colors.TEXT}}>Back</Text>
                                         </TouchableOpacity>
                                     </View>
                                 </Camera> 
@@ -407,17 +370,15 @@ function AddPractice() {
             <View style={{width:"100%",alignItems:"center", position:"absolute", top: 0}}>
                     <AdMobBanner
                     bannerSize="banner"
-                    adUnitID="ca-app-pub-5263616863180217/9832651621"
+                    adUnitID={process.env.GOOGLE_ADS_IDENTIFER}
                     onDidFailToReceiveAdWithError={(e) => console.log(e)}
                     servePersonalizedAds={false}
-                    // style={{padding: 20}}
                     />
             </View>
             <Animated.View 
                 style={{transform:[{translateY:wavesAnim}], opacity: fadeOut}}
                 >
                 <TouchableOpacity onPress={() => {
-                    // createWaves()
                     setModalVisible(true);
                     }} style={{alignSelf:"center"}}>
                     <Ionicons style={style.addButton} name="add-circle-outline" size={theme.typography.size.XXL} color={theme.colors.TEXT}/>
@@ -471,7 +432,6 @@ const styles = theme => StyleSheet.create({
         borderWidth: 1,
         padding: 10,
         backgroundColor: "white",
-        // margin: 5,
         marginBottom: Dimensions.get('window').height / 41,
         width: "100%",
         borderRadius: 15,
@@ -550,21 +510,14 @@ const styles = theme => StyleSheet.create({
         flexDirection: "row",
         width:"90%",
         alignSelf:"center",
-        // bottom: Dimensions.get('window').height/ 20,
-        // position: "absolute",
-        // justifyContent:"center",
-        // alignSelf:"center",
-        // left: 0
     },
     exitSaveButtons: {
         backgroundColor: "white",
         position: "absolute",
         justifyContent:"center",
-        // alignSelf:"flex-end",
         height: Dimensions.get('window').height/ 18,
         width: "48%",
         bottom: Dimensions.get('window').height/ 20,
-        // margin: 5,
         borderRadius: 15
     },
     rightSide:{

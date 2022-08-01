@@ -17,11 +17,6 @@ const PracticeSession = ({navigation, route}) =>{
     const theme = useTheme();
     const style = useThemedStyles(styles);
     const data = route.params.data
-    function makeDateLookNice(date){
-        var myDate = new Date(date)
-        const nicelookingDate = months[myDate.getMonth()] + " " + myDate.getDate() + ", " + myDate.getFullYear() 
-        return nicelookingDate
-    }
     const video = useRef(null)
     const [status, setStatus] = React.useState({});
     const [hasPermission, setHasPermission] = useState(null);
@@ -44,8 +39,6 @@ const PracticeSession = ({navigation, route}) =>{
     const [dropDownItems, setDropDownItems] = useState([
       ]);
     const [practiceSong, setPracticeSong] = useState(data.practiceSong);
-
-    const [num, setNum] = useState(0)
     function createTheDropDownList(){
         var newDropDown = []
         if(setLists != null){
@@ -149,9 +142,6 @@ const PracticeSession = ({navigation, route}) =>{
             setRecording(false)
         }
     }
-    async function updatePracticeSessionStorage(){
-        await AsyncStorage.setItem('practiceSessions', JSON.stringify(practiceSessions));
-    }
     useEffect(() => {
         createTheDropDownList()
     }, [])
@@ -198,7 +188,6 @@ const PracticeSession = ({navigation, route}) =>{
                                 keyboardType="number-pad"
                                 editable={makeEditable}
                             />
-                        {/* <Text style={style.practiceInfoText}>{data.quality}</Text> */}
                     </View>
                     <View style={{width:"90%", alignSelf:"center"}}>
                         <Text style={style.inputHeader} >Notes For Session</Text>
@@ -261,14 +250,6 @@ const PracticeSession = ({navigation, route}) =>{
                                 }
                                 <View style={{width:"90%", alignSelf:"center"}}>
                                 <Text style={style.inputHeader}>Song Your Working On</Text>
-                                {/* <TextInput 
-                                        style={style.practiceInfoText}
-                                        onChangeText={setQuality}
-                                        value={quality ? quality.toString() : quality}
-                                        placeholder="Chose Your Song (optional)"
-                                        placeholderTextColor="gray"
-                                        keyboardType="number-pad"
-                                    /> */}
                                     <DropDownPicker
                                         open={dropDownOpen}
                                         value={practiceSong}
@@ -286,12 +267,6 @@ const PracticeSession = ({navigation, route}) =>{
                                 <TouchableOpacity
                                 onPress={() => {
                                     updatePracticeSession()
-                                    // setModalVisible(!modalVisible)
-                                    // setVideoUri(null);
-                                    // setPracticeTime(null)
-                                    // setDownloadedVid(null);
-                                    // setNotes(null);
-                                    // setQuality(null);
                                 }}
                                 style={style.exitSaveButtons}
                                 >
@@ -335,9 +310,12 @@ const PracticeSession = ({navigation, route}) =>{
                                         onPress={() => {
                                             setCameraVisible(false)
                                             setModalVisible(true)
+                                            if(recording){
+                                                startRecord()
+                                            }
                                         }}
                                         style={style.button}>
-                                            <Text style={{fontSize: theme.typography.size.SM, color: theme.colors.TEXT}}>Back button</Text>
+                                            <Text style={{fontSize: theme.typography.size.SM, color: theme.colors.TEXT}}>Back</Text>
                                         </TouchableOpacity>
                                     </View>
                                 </Camera> 
@@ -362,130 +340,6 @@ const PracticeSession = ({navigation, route}) =>{
 export default PracticeSession
 
 const styles = theme => StyleSheet.create({
-    // video: {
-    //     width: Dimensions.get('window').width,
-    //     height: 400
-    // },
-    // dateHeader : {
-    //     fontSize: 25
-    // },
-    // pSessionContainer: {
-    //     backgroundColor: "white",
-    //     borderWidth: 2,
-    // },
-    // practiceSessionTitle: {
-    //     color: theme.colors.TEXT,
-    //     fontSize: 35,
-    //     fontWeight: "bold" 
-    // },
-    // practiceInfoText: {
-    //     color: theme.colors.TEXT_SECONDARY,
-    //     height: 50,
-    //     borderWidth: 1,
-    //     padding: 10,
-    //     backgroundColor: "white",
-    //     margin: 5,
-    //     marginBottom: 23,
-    //     width: 350,
-    //     borderRadius: 15,
-    //     padding:10
-    // },
-    // notesInfo: {
-    //     color: theme.colors.TEXT_SECONDARY,
-    //     height: 80,
-    //     borderWidth: 1,
-    //     // padding: 10,
-    //     backgroundColor: "white",
-    //     margin: 5,
-    //     padding:10,
-    //     width: 350,
-    //     borderRadius: 15
-    // },
-    // practiceContainer : {
-    //     flex: 1,
-    //     backgroundColor: theme.colors.BACKGROUND,
-    //     alignItems: 'center',
-    //     color: "#CF5C36",
-    //     paddingTop: 60
-    // },
-    // inputHeader: {
-    //     margin: 5,
-    //     fontSize: 18,
-    //     color: theme.colors.TEXT
-    // },
-    // video:{
-    //     width: "100%",
-    //     height: "100%",
-    //     zIndex: 0,
-    //     borderRadius:15
-    // },
-    // myVideoContainer: {
-    //     color: theme.colors.TEXT_SECONDARY,
-    //     height: 210,
-    //     borderWidth: 1,
-    //     backgroundColor: "white",
-    //     margin: 5,
-    //     width: 350,
-    //     borderRadius: 16,
-    //     justifyContent: "center",
-    //     alignItems: "center"
-    // },
-    // deleteRecordedVideoButton : {
-    //     position: "absolute",
-    //     top: 0,
-    //     right: 0,
-    //     width: 35,
-    //     height: 35,
-    //     backgroundColor: "white",
-    //     zIndex: 100,
-    //     justifyContent:"center",
-    //     alignItems: "center",
-    //     borderTopRightRadius: 15
-    // },
-    // exitSaveButtonsContainer: {
-    //     flex: 1,
-    //     // flexDirection: "row",
-    //     // margin: 5,
-    //     // padding:10
-    // },
-    // exitSaveButtons: {
-    //     backgroundColor: theme.colors.ACCENT,
-    //     position: "absolute",
-    //     justifyContent:"center",
-    //     alignSelf:"center",
-    //     height: 50,
-    //     width: 350,
-    //     bottom: 60,
-    //     // margin: 5,
-    //     borderRadius: 15,
-    //     borderWidth: 1,
-    //     margin: 5,
-    //     // padding:10
-    // },
-    // exitButtonsStyle: {
-    //     fontSize: 18,
-    //     textAlign: "center"
-    // },
-    // camera : {
-    //     flex : 1
-    // },
-    // buttonContainer: {
-    //     flex: 1,
-    //     backgroundColor: 'transparent',
-    //     flexDirection: 'row',
-    //     margin: 50,
-    //   },
-    //   button: {
-    //     zIndex: 1000,
-    //     flex: 0.333,
-    //     alignSelf: 'flex-end',
-    //     // margin: 10,
-    //     height:80,
-    //     alignContent:"center",
-    //     justifyContent: "center",
-    //     alignItems: "center",
-    //     textAlignVertical:"center"
-    //   },
     video:{
         width: "100%",
         height: "100%",
@@ -526,7 +380,6 @@ const styles = theme => StyleSheet.create({
         height: Dimensions.get('window').height / 18,
         borderWidth: 1,
         backgroundColor: "white",
-        // margin: 5,
         marginBottom: Dimensions.get('window').height / 41,
         width: "100%",
         borderRadius: 15,
@@ -539,8 +392,6 @@ const styles = theme => StyleSheet.create({
         borderWidth: 1,
         padding: 10,
         backgroundColor: "white",
-        // marginBottom: 5,
-        // marginTop: 5,
         padding:10,
         width: "100%",
         borderRadius: 15,
@@ -548,7 +399,6 @@ const styles = theme => StyleSheet.create({
     },
     myVideoContainer: {
         color: theme.colors.TEXT_SECONDARY,
-        // height was 210
         height: Dimensions.get('window').height /4.4,
         borderWidth: 1,
         backgroundColor: "white",
@@ -605,22 +455,15 @@ const styles = theme => StyleSheet.create({
         flexDirection: "row",
         width:"90%",
         alignSelf:"center",
-        // bottom: Dimensions.get('window').height/ 20,
-        // position: "absolute",
-        // justifyContent:"center",
-        // alignSelf:"center",
-        // left: 0
     },
     exitSaveButtons: {
         backgroundColor: "white",
         position: "absolute",
         justifyContent:"center",
-        // alignSelf:"flex-end",
         height: Dimensions.get('window').height/ 18,
         width: "100%",
         backgroundColor: theme.colors.ACCENT,
         bottom: Dimensions.get('window').height/ 26,
-        // margin: 5,
         borderRadius: 15
     },
     rightSide:{
