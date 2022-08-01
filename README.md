@@ -3,22 +3,28 @@ This app created with React Native allows users to store detailed practice sessi
 
 # Screens
 ## Add Practice Screen
+![](https://user-images.githubusercontent.com/77705797/182207563-9c260308-e6a6-45c1-a21f-15f91125f4cd.png | width=250x250)
+
 ### Overview
 This page lets users add to add a practice session with inputs for practice time (mins), quality of session which is a number 1 - 10, optional notes, optional record a video, and optional select which song you are practicing.
 ### Details
 When you are done inputing the information for the practice session click on the Save button, which will call function downloadFile().  This function moves the temporary file to a memory location on the device.  Next downloadFile will call the function storePracticeSession which stores all the details for the practiceSession into an array of PracticeSessions in local storage called 'practiceSessions'.
 ## Home Screen
+ ![Simulator Screen Shot - iPhone 13 - 2022-08-01 at 12 28 15](https://user-images.githubusercontent.com/77705797/182207642-61f588d8-269e-4c40-aa49-e8b61390fd30.png)
 ### Overview
 This page shows the user all their practice sessions organized from last week, this month, and this year.  This page also gives the user helpful stats, time practiced, average quality of each session and a graph of practice times.
 ### Details
 Using the react context called practice sessions, which gets all the practice sesssion from local storage, the page will retrieve all the sessions associated with either last week, this month, or this year.  Using this information the amount of practice time is calculated and put into a chart
 
 ## Goal Screen 
+![Simulator Screen Shot - iPhone 13 - 2022-08-01 at 12 28 58](https://user-images.githubusercontent.com/77705797/182207738-d25aff94-a99e-40df-b816-d699eaf4c525.png)
 ### Overview
 This page allows users to choose practice time goals daily, weekly, and monthly.  The page also calculates how much progress you have made towards all of your goals.
 ### Details
 I store all the goals in local storage variables, dailyGoal, weeklyGoal, and monthlyGoal.  The calculations get updated whenever practiceSessions change or dailyGoal, weeklyGoal, or monthlyGoal changes.
+
 ## Set List Screen 
+![Simulator Screen Shot - iPhone 13 - 2022-08-01 at 12 29 55](https://user-images.githubusercontent.com/77705797/182207919-311d41e0-baee-487d-ad61-6a95341a8074.png)
 ### Overview 
 This screen is used to hold all the songs the user is working on.  It also calculates how much time the user has spent on each of the songs.  
 ## Details
