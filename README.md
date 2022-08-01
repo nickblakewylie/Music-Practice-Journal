@@ -1,4 +1,5 @@
 # Music Practice Logger
+## [Link to App on App Store](https://apps.apple.com/us/app/music-practice-journal/id1612882454)
 This app created with React Native allows users to store detailed practice sessions and view their progress over time.  By having musicans record information about the practice they become more focused and  This app uses the module expo camera to record the videos and store the videos in local storage on the users phone.
 
 # Screens
