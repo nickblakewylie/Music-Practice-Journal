@@ -34,3 +34,6 @@ I store all the goals in local storage variables, dailyGoal, weeklyGoal, and mon
 This screen is used to hold all the songs the user is working on.  It also calculates how much time the user has spent on each of the songs.  
 ## Details
 This page allows users to add a song to their setlist with a song name, and a song difficulty. Also once a song has been added they have the ability to either delete the song or to change the difficulty of a song.
+
+# To run the application
+Clone the github repository and run the command expo start.  Next press i to run in an ios simulator.  Note this project is intended for ios and has not been tested for web or andriod use. 
